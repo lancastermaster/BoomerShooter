@@ -21,7 +21,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	class AWeapon* Weapon;
+	class AGun* Gun;
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,7 +37,7 @@ protected:
 
 	void LookRight(float AxisValue);
 
-	void SpawnFirstWeapon();
+	void SpawnGun();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10;
@@ -46,7 +46,10 @@ protected:
 	USceneComponent* WeaponSpawn;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AWeapon> WeaponClass;
+	TSubclassOf<AGun> GunClass;
+
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* Camera;
 private:	
 
 };

@@ -17,8 +17,15 @@ AGun::AGun()
 
 void AGun::Attack()
 {
+    Super::Attack();
+    //UE_LOG(LogTemp, Warning, TEXT("BANG!!!"));
+
     if(MuzzleSound != nullptr)
     {
         UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
+        if(MuzzleFlash != nullptr)
+        {
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation());
+        }
     }
 }

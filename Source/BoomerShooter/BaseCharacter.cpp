@@ -3,7 +3,8 @@
 
 #include "BaseCharacter.h"
 #include "Components/SceneComponent.h"
-#include "Weapon.h"
+#include "Gun.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -11,8 +12,11 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera -> SetupAttachment(RootComponent);
+
 	WeaponSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Weapon Spawn Point"));
-	WeaponSpawn -> SetupAttachment(RootComponent);
+	WeaponSpawn -> SetupAttachment(Camera);
 }
 
 // Called when the game starts or when spawned
@@ -20,13 +24,13 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SpawnGun();
 }
 
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -64,10 +68,25 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BANG!!!"));
+	//UE_LOG(LogTemp, Warning, TEXT("BANG!!!"));
+	if(Gun == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("The gun is not spawning properly!"));
+	}
+	Gun->Attack();
+	
 }
 
-void ABaseCharacter::SpawnFirstWeapon()
+void ABaseCharacter::SpawnGun()
 {
-	
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	Gun->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
+	Gun->SetOwner(this);
+
+	/*
+	Gun = GetWorld()->SpawnActor<AGun>(GunClasses[0]);
+	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+	Gun->SetOwner(this);
+	*/
 }
