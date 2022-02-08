@@ -26,9 +26,18 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		class UParticleSystem* MuzzleFlash;
+		
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		class UParticleSystem* BeamParticles;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		class UParticleSystem* HitParticles;
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		class USoundBase* MuzzleSound;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		class USoundBase* HitSound;
 		
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float Range;
