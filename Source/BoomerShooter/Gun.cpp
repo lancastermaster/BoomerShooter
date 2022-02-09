@@ -16,22 +16,10 @@ AGun::AGun()
     BulletSpawn -> SetupAttachment(WeaponMesh);
 }
 
-void AGun::Attack()
+bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBeamLocation)
 {
-    Super::Attack();
-    //UE_LOG(LogTemp, Warning, TEXT("BANG!!!"));
-
     //float RandX = FMath::FRandRange(0, 200);
     //float RandZ = FMath::FRandRange(0, 200);
-
-    if(MuzzleSound != nullptr)
-    {
-        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
-        if(MuzzleFlash != nullptr)
-        {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation(), BulletSpawn->GetComponentRotation());
-        }
-    }
 
     FVector2D ViewPortSize;
     if(GEngine && GEngine->GameViewport)
@@ -51,7 +39,6 @@ void AGun::Attack()
         CrosshairWorldPosition,
         CrosshairWorldDirection);
 
-    //was deprojection successful?
     if(bScreenToWorld)
     {
         FHitResult ScreenTraceHit; 
@@ -61,52 +48,62 @@ void AGun::Attack()
         //End.Z = End.Z + RandZ; 
 
         //Set beam end point to line trace end point
-        FVector BeamEndPoint{End};
+        OutBeamLocation = End;
 
         //Trace outward from crosshairs world location
         GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
         if(ScreenTraceHit.bBlockingHit) // was there a trace hit?
         {
-            BeamEndPoint = ScreenTraceHit.Location;
-            if(HitParticles)
+            OutBeamLocation = ScreenTraceHit.Location;
+            
+
+            //perfomr trace from barrel
+            FHitResult WeaponTraceHit;
+            const FVector WeaponTraceStart{BulletSpawnLocation};
+            const FVector WeaponTraceEnd{OutBeamLocation};
+
+            GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+
+            if (WeaponTraceHit.bBlockingHit)
             {
-                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, ScreenTraceHit.Location);
+                OutBeamLocation = WeaponTraceHit.Location;
             }
-            if(BeamParticles)
-            {
-                UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
-                if(Beam)
-                {
-                    Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
-                }
-            }
+            return true;
+
         }
     }
+    return false;
+}
 
-    /*FHitResult FireHit;
-    const FVector Start{BulletSpawn->GetComponentLocation()};
-    const FQuat Rotation {BulletSpawn->GetComponentRotation()};
-    const FVector RotationAxis {Rotation.GetAxisX()};
-    FVector End {Start + RotationAxis * Range};
-    End.X = End.X + RandX;
-    End.Z = End.Z + RandZ;
+void AGun::Attack()
+{
+    Super::Attack();
 
-    FVector BeamEndPoint{ End };
-
-    GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
-    if(FireHit.bBlockingHit)
+    if(MuzzleSound != nullptr)
     {
-        //DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-        //DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 2.f);
-        BeamEndPoint = FireHit.Location;
-        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, FireHit.Location);
-    }
-    if(BeamParticles)
-    {
-        UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, Start);
-        if(Beam)
+        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
+        if(MuzzleFlash != nullptr)
         {
-            Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation(), BulletSpawn->GetComponentRotation());
         }
-    }*/
+    }
+
+    FVector BeamEnd;
+    bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamEnd);
+    if(bBeamEnd)
+    {
+        if(HitParticles)
+        {
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamEnd);
+        }
+
+        if(BeamParticles)
+        {
+            UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
+            if(Beam)
+            {
+                Beam->SetVectorParameter(FName("Target"), BeamEnd);
+            }
+        }
+    }
 }

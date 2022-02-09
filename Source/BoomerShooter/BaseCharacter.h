@@ -50,6 +50,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
-private:	
+
+private:
 
 };

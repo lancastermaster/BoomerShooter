@@ -68,7 +68,6 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("BANG!!!"));
 	if(Gun == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("The gun is not spawning properly!"));
@@ -82,11 +81,4 @@ void ABaseCharacter::SpawnGun()
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
 	Gun->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
 	Gun->SetOwner(this);
-
-	/*
-	Gun = GetWorld()->SpawnActor<AGun>(GunClasses[0]);
-	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
-	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
-	Gun->SetOwner(this);
-	*/
 }
