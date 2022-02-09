@@ -20,6 +20,9 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		virtual void Attack() override;
 
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		float FireRate;
+
 	protected:
 		// Called when the game starts or when spawned
 		//virtual void BeginPlay() override;
@@ -47,10 +50,7 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		class USceneComponent* BulletSpawn;
 
-		UPROPERTY(EditAnywhere, Category = "Combat")
-		float FireRate;
 		
-		FTimerHandle FireRateHandle;
-	
+		
 	private:
 };

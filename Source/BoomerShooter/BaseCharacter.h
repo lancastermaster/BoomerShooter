@@ -30,14 +30,20 @@ protected:
 	void Attack();
 
 	void MoveForward(float AxisValue);
-
 	void MoveRight(float AxisValue);
 
 	void LookUp(float AxisValue);
-
 	void LookRight(float AxisValue);
 
 	void SpawnGun();
+
+	void FireButtonPressed();
+	void FireButtonReleased();
+
+	void StartFireTimer();
+
+	UFUNCTION()
+	void AutoFireReset();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10;
@@ -52,5 +58,11 @@ protected:
 	class UCameraComponent* Camera;
 
 private:
+
+	FTimerHandle AutoFireTimer;
+
+	bool bFireButtonPressed; //left mouse or right trigger
+
+	bool bShouldFire; //true when firing possible, false when waiting for timer
 
 };

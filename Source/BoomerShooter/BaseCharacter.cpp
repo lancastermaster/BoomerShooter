@@ -17,6 +17,9 @@ ABaseCharacter::ABaseCharacter()
 
 	WeaponSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Weapon Spawn Point"));
 	WeaponSpawn -> SetupAttachment(Camera);
+
+	bShouldFire = true;
+	bFireButtonPressed = false;
 }
 
 // Called when the game starts or when spawned
@@ -42,7 +45,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis(TEXT("Look Up"), this, &ABaseCharacter::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Look Right"), this, &ABaseCharacter::LookRight);
 
-	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Attack);
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &ABaseCharacter::FireButtonPressed);
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Released, this, &ABaseCharacter::FireButtonReleased);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Jump);
 }
 
@@ -68,12 +72,7 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	if(Gun == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("The gun is not spawning properly!"));
-	}
 	Gun->Attack();
-	
 }
 
 void ABaseCharacter::SpawnGun()
@@ -81,4 +80,34 @@ void ABaseCharacter::SpawnGun()
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
 	Gun->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
 	Gun->SetOwner(this);
+}
+
+void ABaseCharacter::FireButtonPressed()
+{
+    bFireButtonPressed = true;
+	StartFireTimer();
+}
+
+void ABaseCharacter::FireButtonReleased()
+{
+    bFireButtonPressed = false;
+}
+
+void ABaseCharacter::StartFireTimer()
+{
+	if(bShouldFire)
+	{
+		Attack();
+		bShouldFire = false;
+		GetWorldTimerManager().SetTimer(AutoFireTimer, this, &ABaseCharacter::AutoFireReset, Gun->FireRate);
+	}
+}
+
+void ABaseCharacter::AutoFireReset()
+{
+	bShouldFire = true;
+	if(bFireButtonPressed)
+	{
+		StartFireTimer();
+	}
 }
