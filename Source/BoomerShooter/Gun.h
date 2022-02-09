@@ -60,6 +60,9 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		float Range;
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
+		float GunSpread;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
 		class USceneComponent* BulletSpawn;
 
 		UPROPERTY(EditAnywhere, Category = "Combat")

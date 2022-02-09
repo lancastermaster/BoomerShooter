@@ -18,8 +18,8 @@ AGun::AGun()
 
 bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBeamLocation)
 {
-    float RandX = FMath::FRandRange(0, 200);
-    float RandZ = FMath::FRandRange(0, 200);
+    float RandX = FMath::FRandRange(0, GunSpread);
+    float RandZ = FMath::FRandRange(0, GunSpread);
 
     FVector2D ViewPortSize;
     if(GEngine && GEngine->GameViewport)
