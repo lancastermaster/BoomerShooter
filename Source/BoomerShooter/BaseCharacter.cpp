@@ -72,7 +72,16 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	Gun->Attack();
+	switch(Gun->GunType)
+	{
+		case 0:
+		Gun->Attack();
+		break;
+
+		case 1:
+		Gun->Shotgun();
+		break;
+	}
 }
 
 void ABaseCharacter::SpawnGun()

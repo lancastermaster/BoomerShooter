@@ -18,8 +18,8 @@ AGun::AGun()
 
 bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBeamLocation)
 {
-    //float RandX = FMath::FRandRange(0, 200);
-    //float RandZ = FMath::FRandRange(0, 200);
+    float RandX = FMath::FRandRange(0, 200);
+    float RandZ = FMath::FRandRange(0, 200);
 
     FVector2D ViewPortSize;
     if(GEngine && GEngine->GameViewport)
@@ -44,8 +44,8 @@ bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBe
         FHitResult ScreenTraceHit; 
         const FVector Start{CrosshairWorldPosition};
         FVector End {CrosshairWorldPosition + CrosshairWorldDirection * Range};
-        //End.X = End.X + RandX;
-        //End.Z = End.Z + RandZ; 
+        End.X = End.X + RandX;
+        End.Z = End.Z + RandZ; 
 
         //Set beam end point to line trace end point
         OutBeamLocation = End;
@@ -106,4 +106,39 @@ void AGun::Attack()
             }
         }
     }
+}
+
+void AGun::Shotgun()
+{
+    if(MuzzleSound != nullptr)
+    {
+        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
+        if(MuzzleFlash != nullptr)
+        {
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation(), BulletSpawn->GetComponentRotation());
+        }
+    }
+
+    for(int i = 0; i < BulletCount; i++)
+    {
+        FVector BeamEnd;
+        bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamEnd);
+        if(bBeamEnd)
+        {
+            if(HitParticles)
+            {
+                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamEnd);
+            }
+
+            if(BeamParticles)
+            {
+                UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
+                if(Beam)
+                {
+                    Beam->SetVectorParameter(FName("Target"), BeamEnd);
+                }
+            }
+        }
+    }
+
 }

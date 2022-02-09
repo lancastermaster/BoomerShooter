@@ -9,6 +9,13 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+		enum class EGunType : uint8 {
+			RIFLE = 0 UMETA(DisplayName = "RIFLE"),
+			SHOTGUN = 1 UMETA(DisplayName = "SHOTGUN"),
+			PROJECTILELAUNCHER = 2 UMETA(DisplayName = "PROJECTILELAUNCHER")
+		};
+
 UCLASS()
 class BOOMERSHOOTER_API AGun : public AWeapon
 {
@@ -20,8 +27,13 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		virtual void Attack() override;
 
+		void Shotgun();
+
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float FireRate;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		EGunType GunType;
 
 	protected:
 		// Called when the game starts or when spawned
@@ -50,7 +62,8 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		class USceneComponent* BulletSpawn;
 
-		
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		int BulletCount;
 		
 	private:
 };
