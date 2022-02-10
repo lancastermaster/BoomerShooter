@@ -21,6 +21,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(BlueprintReadWrite)
 	class AGun* Gun;
 
 protected:
@@ -53,6 +54,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGun> GunClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<AGun>> Gunclasses;
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;

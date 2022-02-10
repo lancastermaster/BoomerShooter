@@ -32,7 +32,7 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float FireRate;
 
-		UPROPERTY(EditAnywhere, Category = "Combat")
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		EGunType GunType;
 
 	protected:
