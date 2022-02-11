@@ -95,19 +95,18 @@ void ABaseCharacter::Attack()
 	}
 }
 
-void ABaseCharacter::SpawnGun()
+/*void ABaseCharacter::SpawnGun()
 {
 	Gun = GetWorld()->SpawnActor<AGun>(GunClasses[0]);
 	Gun->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
 	Gun->SetOwner(this);
-}
+}*/
 
 void ABaseCharacter::SpawnGuns()
 {
 	for(int i = 0; i < GunClasses.Num();i++)
 	{
 		Guns.EmplaceAt(i, GetWorld()->SpawnActor<AGun>(GunClasses[i]));
-		//Guns[i] = GetWorld()->SpawnActor<AGun>(GunClasses[i]);
 
 		if(Guns[i] != nullptr)
 		{

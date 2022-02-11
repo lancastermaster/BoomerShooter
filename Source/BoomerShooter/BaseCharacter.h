@@ -43,7 +43,7 @@ protected:
 	void DecreaseActiveIndex();
 	void EquipGun();
 
-	void SpawnGun();
+	//void SpawnGun();
 	void SpawnGuns();
 
 	void FireButtonPressed();
@@ -75,5 +75,17 @@ private:
 	bool bShouldFire; //true when firing possible, false when waiting for timer
 
 	int ActiveIndex = 0;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
+	int MaxHealth;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Health", meta = (AllowPrivateAccess = true))
+	int Health;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	int MaxMana;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	int Mana;
 
 };
