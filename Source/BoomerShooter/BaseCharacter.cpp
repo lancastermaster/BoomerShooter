@@ -27,6 +27,9 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Health = MaxHealth;
+	Mana = MaxMana;
 	
 	SpawnGuns();
 }
@@ -80,6 +83,12 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
+	/*FVector GunLocationStart = Gun -> GetActorLocation();
+	FVector GunLocationFire = FVector(GunLocationStart.X - 5, GunLocationStart.Y, GunLocationStart.Z);
+
+	Gun -> AddActorLocalOffset(GunLocationFire);
+	Gun -> AddActorLocalOffset(GunLocationStart);*/
+
 	switch(Gun->GunType)
 	{
 		case EGunType::RIFLE:
@@ -94,13 +103,6 @@ void ABaseCharacter::Attack()
 		break;
 	}
 }
-
-/*void ABaseCharacter::SpawnGun()
-{
-	Gun = GetWorld()->SpawnActor<AGun>(GunClasses[0]);
-	Gun->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
-	Gun->SetOwner(this);
-}*/
 
 void ABaseCharacter::SpawnGuns()
 {
