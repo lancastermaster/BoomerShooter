@@ -24,6 +24,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	class AGun* Gun;
 
+	UPROPERTY(BlueprintReadWrite)
+	TArray<AGun*> Guns;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,7 +39,12 @@ protected:
 	void LookUp(float AxisValue);
 	void LookRight(float AxisValue);
 
+	void IncreaseActiveIndex();
+	void DecreaseActiveIndex();
+	void EquipGun();
+
 	void SpawnGun();
+	void SpawnGuns();
 
 	void FireButtonPressed();
 	void FireButtonReleased();
@@ -53,10 +61,7 @@ protected:
 	USceneComponent* WeaponSpawn;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AGun> GunClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<AGun>> Gunclasses;
+	TArray<TSubclassOf<AGun>> GunClasses;
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
@@ -68,5 +73,7 @@ private:
 	bool bFireButtonPressed; //left mouse or right trigger
 
 	bool bShouldFire; //true when firing possible, false when waiting for timer
+
+	int ActiveIndex = 0;
 
 };

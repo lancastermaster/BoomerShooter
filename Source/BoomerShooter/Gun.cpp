@@ -56,8 +56,7 @@ bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBe
         {
             OutBeamLocation = ScreenTraceHit.Location;
             
-
-            //perfomr trace from barrel
+            //perform trace from barrel
             FHitResult WeaponTraceHit;
             const FVector WeaponTraceStart{BulletSpawnLocation};
             const FVector WeaponTraceEnd{OutBeamLocation};
@@ -69,7 +68,6 @@ bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBe
                 OutBeamLocation = WeaponTraceHit.Location;
             }
             return true;
-
         }
     }
     return false;

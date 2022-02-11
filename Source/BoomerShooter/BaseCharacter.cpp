@@ -5,6 +5,7 @@
 #include "Components/SceneComponent.h"
 #include "Gun.h"
 #include "Camera/CameraComponent.h"
+#include "Containers/Array.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -27,13 +28,18 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnGun();
+	SpawnGuns();
 }
 
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(bFireButtonPressed)
+	{
+		StartFireTimer();
+	}
 }
 
 // Called to bind functionality to input
@@ -48,6 +54,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &ABaseCharacter::FireButtonPressed);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Released, this, &ABaseCharacter::FireButtonReleased);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("NextWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::IncreaseActiveIndex);
+	PlayerInputComponent->BindAction(TEXT("PreviousWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::DecreaseActiveIndex);
 }
 
 void ABaseCharacter::MoveForward(float AxisValue)
@@ -74,27 +82,47 @@ void ABaseCharacter::Attack()
 {
 	switch(Gun->GunType)
 	{
-		case 0:
+		case EGunType::RIFLE:
 		Gun->Attack();
 		break;
 
-		case 1:
+		case EGunType::SHOTGUN:
 		Gun->Shotgun();
+		break;
+
+		case EGunType::PROJECTILELAUNCHER:
 		break;
 	}
 }
 
 void ABaseCharacter::SpawnGun()
 {
-	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	Gun = GetWorld()->SpawnActor<AGun>(GunClasses[0]);
 	Gun->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
 	Gun->SetOwner(this);
+}
+
+void ABaseCharacter::SpawnGuns()
+{
+	for(int i = 0; i < GunClasses.Num();i++)
+	{
+		Guns.EmplaceAt(i, GetWorld()->SpawnActor<AGun>(GunClasses[i]));
+		//Guns[i] = GetWorld()->SpawnActor<AGun>(GunClasses[i]);
+
+		if(Guns[i] != nullptr)
+		{
+			Guns[i]->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
+			Guns[i]->SetOwner(this);
+			Guns[i] -> SetActorHiddenInGame(true);
+		}
+	}
+	EquipGun();
+	Gun -> SetActorHiddenInGame(false);
 }
 
 void ABaseCharacter::FireButtonPressed()
 {
     bFireButtonPressed = true;
-	StartFireTimer();
 }
 
 void ABaseCharacter::FireButtonReleased()
@@ -119,4 +147,39 @@ void ABaseCharacter::AutoFireReset()
 	{
 		StartFireTimer();
 	}
+}
+
+void ABaseCharacter::EquipGun()
+{
+	Gun = Guns[ActiveIndex];
+}
+
+void ABaseCharacter::IncreaseActiveIndex()
+{
+	Gun -> SetActorHiddenInGame(true);
+	if(ActiveIndex < (Guns.Num()-1))
+	{
+		ActiveIndex++;
+	}
+	else
+	{
+		ActiveIndex = 0;
+	}
+	EquipGun();
+	Gun -> SetActorHiddenInGame(false);
+}
+
+void ABaseCharacter::DecreaseActiveIndex()
+{
+	Gun -> SetActorHiddenInGame(true);
+	if(ActiveIndex > 0)
+	{
+		ActiveIndex--;
+	}
+	else
+	{
+		ActiveIndex = (Guns.Num()-1);
+	}
+	EquipGun();
+	Gun -> SetActorHiddenInGame(false);
 }
