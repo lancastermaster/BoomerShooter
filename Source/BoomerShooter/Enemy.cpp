@@ -54,7 +54,10 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 			FRotator(0.f), 
 			true);
 	}
-	ShowHealthBar();
+	if(CanSeeHealthBar)
+	{
+		ShowHealthBar();
+	}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, AController* EventInstigator, AActor* DamageCauser)

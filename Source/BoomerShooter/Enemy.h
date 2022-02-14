@@ -70,4 +70,6 @@ private:
 
 	FTimerHandle HealthBarTimer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	bool CanSeeHealthBar;
 };
