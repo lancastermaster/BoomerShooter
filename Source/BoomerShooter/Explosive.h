@@ -4,40 +4,34 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Weapon.generated.h"
+#include "BulletHitInterface.h"
+#include "Explosive.generated.h"
 
 UCLASS()
-class BOOMERSHOOTER_API AWeapon : public AActor
+class BOOMERSHOOTER_API AExplosive : public AActor, public IBulletHitInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AWeapon();
+	AExplosive();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Attack();
+	virtual void BulletHit_Implementation(FHitResult HitResult) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	AController* GetOwnerController() const;
+private:	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class UParticleSystem* ExplodeParticles;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	float Damage;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	float CritDamage;
-
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class USceneComponent* Root;
-
-	UPROPERTY(EditAnywhere, Category = "Components")
-	class UStaticMeshComponent* WeaponMesh;
-
-private:	
+	class USoundCue* ImpactSound;
 
 };

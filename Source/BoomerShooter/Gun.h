@@ -39,7 +39,7 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		// Called when the game starts or when spawned
 		//virtual void BeginPlay() override;
 
-		bool GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBeamLocation);
+		bool GetBeamEndLocation(const FVector& BulletSpawnLocation, FHitResult& OutHitResult);
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		class UParticleSystem* MuzzleFlash;

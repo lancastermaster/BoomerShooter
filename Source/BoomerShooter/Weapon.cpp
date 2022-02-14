@@ -18,6 +18,8 @@ AWeapon::AWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
 	WeaponMesh -> SetupAttachment(RootComponent);
+
+	CritDamage = Damage * 3.f;
 }
 
 // Called when the game starts or when spawned

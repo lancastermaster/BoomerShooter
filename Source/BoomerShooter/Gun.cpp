@@ -8,6 +8,8 @@
 #include "Components/SceneComponent.h"
 #include "Engine/EngineTypes.h"
 #include "DrawDebugHelpers.h"
+#include "BulletHitInterface.h"
+#include "Enemy.h"
 
 
 AGun::AGun()
@@ -16,10 +18,10 @@ AGun::AGun()
     BulletSpawn -> SetupAttachment(WeaponMesh);
 }
 
-bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBeamLocation)
+bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FHitResult& OutHitResult)
 {
-    float RandX = FMath::FRandRange(0, GunSpread);
-    float RandZ = FMath::FRandRange(0, GunSpread);
+    float RandX = FMath::FRandRange(-GunSpread, GunSpread);
+    float RandZ = FMath::FRandRange(-GunSpread, GunSpread);
 
     FVector2D ViewPortSize;
     if(GEngine && GEngine->GameViewport)
@@ -42,8 +44,9 @@ bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBe
     if(bScreenToWorld)
     {
         FHitResult ScreenTraceHit; 
-        const FVector Start{CrosshairWorldPosition};
+        FVector Start{CrosshairWorldPosition};
         FVector End {CrosshairWorldPosition + CrosshairWorldDirection * Range};
+        FVector OutBeamLocation;
         End.X = End.X + RandX;
         End.Z = End.Z + RandZ; 
 
@@ -57,15 +60,15 @@ bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FVector& OutBe
             OutBeamLocation = ScreenTraceHit.Location;
             
             //perform trace from barrel
-            FHitResult WeaponTraceHit;
             const FVector WeaponTraceStart{BulletSpawnLocation};
             const FVector WeaponTraceEnd{OutBeamLocation};
 
-            GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+            GetWorld()->LineTraceSingleByChannel(OutHitResult, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
 
-            if (WeaponTraceHit.bBlockingHit)
+            if (!OutHitResult.bBlockingHit)
             {
-                OutBeamLocation = WeaponTraceHit.Location;
+                OutHitResult.Location = OutBeamLocation;
+                return false;
             }
             return true;
         }
@@ -86,21 +89,59 @@ void AGun::Attack()
         }
     }
 
-    FVector BeamEnd;
-    bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamEnd);
+    FHitResult BeamHitResult;
+    bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamHitResult);
     if(bBeamEnd)
     {
-        if(HitParticles)
+        //Does hit actor implement BullHitInterface
+        if(BeamHitResult.Actor.IsValid())
         {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamEnd);
+            IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
+            if(BulletHitInterface)
+            {
+                BulletHitInterface -> BulletHit_Implementation(BeamHitResult);
+            }
+
+            AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
+            if(HitEnemy)
+            {
+                if(BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
+                {
+                    UGameplayStatics::ApplyDamage(
+                    BeamHitResult.Actor.Get(), 
+                    CritDamage, 
+                    this->GetOwnerController(), 
+                    this, 
+                    UDamageType::StaticClass());
+                }
+                else
+                {
+                    UGameplayStatics::ApplyDamage(
+                    BeamHitResult.Actor.Get(), 
+                    Damage, 
+                    this->GetOwnerController(), 
+                    this, 
+                    UDamageType::StaticClass());
+                }
+                
+            }
         }
+        else
+        {
+            //Spawn default particles
+            if(HitParticles)
+            {
+                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamHitResult.Location);
+            }
+        }
+
 
         if(BeamParticles)
         {
             UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
             if(Beam)
             {
-                Beam->SetVectorParameter(FName("Target"), BeamEnd);
+                Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
             }
         }
     }
@@ -119,24 +160,66 @@ void AGun::Shotgun()
 
     for(int i = 0; i < BulletCount; i++)
     {
-        FVector BeamEnd;
-        bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamEnd);
+        FHitResult BeamHitResult;
+        bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamHitResult);
         if(bBeamEnd)
         {
-            if(HitParticles)
+            //Does hit actor implement BullHitInterface
+            if(BeamHitResult.Actor.IsValid())
             {
-                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamEnd);
+                IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
+                if(BulletHitInterface)
+                {
+                    BulletHitInterface -> BulletHit_Implementation(BeamHitResult);
+                }
+                
+                AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
+                if(HitEnemy)
+                {
+                    if(BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
+                    {
+                        UGameplayStatics::ApplyDamage(
+                        BeamHitResult.Actor.Get(), 
+                        CritDamage, 
+                        this->GetOwnerController(), 
+                        this, 
+                        UDamageType::StaticClass());
+                    }
+                    else
+                    {
+                        UGameplayStatics::ApplyDamage(
+                        BeamHitResult.Actor.Get(), 
+                        Damage, 
+                        this->GetOwnerController(), 
+                        this, 
+                        UDamageType::StaticClass());
+                    }
+                    
+                }
+            }
+            else
+            {
+                //Spawn default particles
+                if(HitParticles)
+                {
+                    UGameplayStatics::SpawnEmitterAtLocation(
+                        GetWorld(), 
+                        HitParticles, 
+                        BeamHitResult.Location);
+                }
             }
 
             if(BeamParticles)
             {
-                UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
+                UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+                    GetWorld(), 
+                    BeamParticles, 
+                    BulletSpawn->GetComponentLocation());
                 if(Beam)
                 {
-                    Beam->SetVectorParameter(FName("Target"), BeamEnd);
+                    Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
                 }
             }
         }
     }
-
 }
