@@ -29,6 +29,8 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		void Shotgun();
 
+		void LaunchProjectile();
+
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float FireRate;
 
@@ -67,6 +69,9 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		int BulletCount;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		TSubclassOf<class AProjectile> ProjectileClass;
 		
 	private:
 };

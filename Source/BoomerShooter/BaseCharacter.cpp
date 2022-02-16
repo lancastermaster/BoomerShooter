@@ -100,6 +100,7 @@ void ABaseCharacter::Attack()
 		break;
 
 		case EGunType::PROJECTILELAUNCHER:
+		Gun->LaunchProjectile();
 		break;
 	}
 }

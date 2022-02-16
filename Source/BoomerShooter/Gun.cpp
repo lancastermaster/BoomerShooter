@@ -10,6 +10,7 @@
 #include "DrawDebugHelpers.h"
 #include "BulletHitInterface.h"
 #include "Enemy.h"
+#include "Projectile.h"
 
 
 AGun::AGun()
@@ -123,7 +124,6 @@ void AGun::Attack()
                     this, 
                     UDamageType::StaticClass());
                 }
-                
             }
         }
         else
@@ -134,7 +134,6 @@ void AGun::Attack()
                 UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamHitResult.Location);
             }
         }
-
 
         if(BeamParticles)
         {
@@ -194,7 +193,6 @@ void AGun::Shotgun()
                         this, 
                         UDamageType::StaticClass());
                     }
-                    
                 }
             }
             else
@@ -222,4 +220,13 @@ void AGun::Shotgun()
             }
         }
     }
+}
+
+void AGun::LaunchProjectile()
+{
+    FVector ProjectileSpawnLocation = BulletSpawn->GetComponentLocation();
+	FRotator ProjectileSpawnRotation = BulletSpawn->GetComponentRotation();
+
+	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotation);
+	Projectile->SetOwner(this);
 }
