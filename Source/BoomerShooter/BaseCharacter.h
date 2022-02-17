@@ -27,6 +27,8 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AGun*> Guns;
 
+	bool bFireButtonPressed; //left mouse or right trigger
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -69,8 +71,6 @@ protected:
 private:
 
 	FTimerHandle AutoFireTimer;
-
-	bool bFireButtonPressed; //left mouse or right trigger
 
 	bool bShouldFire; //true when firing possible, false when waiting for timer
 

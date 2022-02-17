@@ -34,6 +34,8 @@ public:
 
 	FORCEINLINE FString GetHeadBone() const {return HeadBone;}
 
+	//FORCEINLINE UBehaviorTree* GetBehaviorTree() const {return BehaviorTree;}
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -89,4 +91,7 @@ private:
 	float HitReactTimeMax;
 
 	bool bCanHitReact;
+
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = true))
+	class UBehaviorTree* BehaviorTree;
 };

@@ -102,6 +102,10 @@ void ABaseCharacter::Attack()
 		case EGunType::PROJECTILELAUNCHER:
 		Gun->LaunchProjectile();
 		break;
+
+		case EGunType::LASER:
+		Gun->Laser();
+		break;
 	}
 }
 
