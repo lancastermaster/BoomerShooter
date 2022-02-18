@@ -14,4 +14,16 @@ class BOOMERSHOOTER_API UKhaimeraAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	
+	public:
+		UFUNCTION(BlueprintCallable)
+		void UpdateAnimationProperties(float DeltaTime);
+
+	protected:
+
+	private:
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement",meta = (AllowPrivateAccess = true))
+		float Speed;
+
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+		class AEnemy* Enemy;
 };
