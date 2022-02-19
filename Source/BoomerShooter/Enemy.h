@@ -85,6 +85,26 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 			UPrimitiveComponent* OtherComp,
 			int32 OtherBodyIndex);
 
+		UFUNCTION()
+		void OnLeftWeaponOverlap(
+			UPrimitiveComponent* OverlappedComponent, 
+			AActor* OtherActor, 
+			UPrimitiveComponent* OtherComp, 
+			int32 OtherBodyIndex, 
+			bool bSweep, 
+			const FHitResult& SweepResult
+		);
+
+		UFUNCTION()
+		void OnRightWeaponOverlap(
+			UPrimitiveComponent* OverlappedComponent, 
+			AActor* OtherActor, 
+			UPrimitiveComponent* OtherComp, 
+			int32 OtherBodyIndex, 
+			bool bSweep, 
+			const FHitResult& SweepResult
+		);
+
 		//spawned or played when hit
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UParticleSystem* ImpactParticles;
@@ -162,7 +182,11 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		FName AttackA;
 		FName AttackB;
 
+		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		class UBoxComponent* LeftWeaponCollision;
 
+		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		class UBoxComponent* RightWeaponCollision;
 	public:
 		FORCEINLINE FString GetHeadBone() const {return HeadBone;}
 
