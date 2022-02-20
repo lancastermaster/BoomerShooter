@@ -112,13 +112,29 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class USoundCue* ImpactSound;
 
+		UFUNCTION(BlueprintCallable)
+		void ActivateLeftWeapon();
+
+		UFUNCTION(BlueprintCallable)
+		void DeactivateLeftWeapon();
+
+		UFUNCTION(BlueprintCallable)
+		void ActivateRightWeapon();
+		
+		UFUNCTION(BlueprintCallable)
+		void DeactivateRightWeapon();
+
+		void DoDamage(AActor* Victim);
 
 	private:
-		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		float MaxHealth = 100.f;
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		float Health = 0.f;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		float BaseDamage = 20.f;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		FString HeadBone;
@@ -131,7 +147,6 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		bool CanSeeHealthBar;
 
-		
 		FTimerHandle HitReactTimer;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
@@ -187,6 +202,7 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UBoxComponent* RightWeaponCollision;
+
 	public:
 		FORCEINLINE FString GetHeadBone() const {return HeadBone;}
 

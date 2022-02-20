@@ -21,6 +21,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(
+		float DamageAmount, 
+		struct FDamageEvent const& Damageevent,
+		class AController* EventInstigator,
+		AActor* DamageCauser) override;
+
 	UPROPERTY(BlueprintReadWrite)
 	class AGun* Gun;
 
@@ -87,5 +93,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
 	float Mana;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float MaxStress;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float Stress;
 
 };

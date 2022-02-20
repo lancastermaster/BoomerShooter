@@ -30,6 +30,7 @@ void ABaseCharacter::BeginPlay()
 
 	Health = MaxHealth;
 	Mana = MaxMana;
+	Stress = 0.f;
 	
 	SpawnGuns();
 }
@@ -83,12 +84,6 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	/*FVector GunLocationStart = Gun -> GetActorLocation();
-	FVector GunLocationFire = FVector(GunLocationStart.X - 5, GunLocationStart.Y, GunLocationStart.Z);
-
-	Gun -> AddActorLocalOffset(GunLocationFire);
-	Gun -> AddActorLocalOffset(GunLocationStart);*/
-
 	switch(Gun->GunType)
 	{
 		case EGunType::RIFLE:
@@ -188,4 +183,17 @@ void ABaseCharacter::DecreaseActiveIndex()
 	}
 	EquipGun();
 	Gun -> SetActorHiddenInGame(false);
+}
+
+float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& Damageevent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	if(Health - DamageAmount <= 0.f)
+	{
+		Health = 0.f;
+	}
+	else
+	{
+		Health -= DamageAmount;
+	}
+	return DamageAmount;
 }
