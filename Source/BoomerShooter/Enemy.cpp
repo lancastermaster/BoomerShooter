@@ -6,6 +6,7 @@
 #include "Sound/SoundCue.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Engine/EngineTypes.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Animation/AnimMontage.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
@@ -42,6 +43,8 @@ AEnemy::AEnemy()
 	AttackBFast = (TEXT("AttackB_Fast"));
 	AttackA = (TEXT("AttackA"));
 	AttackB = (TEXT("AttackB"));
+	LeftWeaponSocket = (TEXT("FX_Trail_L_01"));
+	RightWeaponSocket = (TEXT("FX_Trail_R_01"));
 }
 
 // Called when the game starts or when spawned
@@ -324,25 +327,36 @@ void AEnemy::SetStunned(bool Stunned)
 
 void AEnemy::OnLeftWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bSweep, const FHitResult& SweepResult)
 {
-	DoDamage(OtherActor);
+	auto Character = Cast<ABaseCharacter>(OtherActor);
+	if(Character)
+	{
+		DoDamage(Character);
+
+		SpawnBlood(Character, LeftWeaponSocket);
+	}
 }
 
 void AEnemy::OnRightWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bSweep, const FHitResult& SweepResult)
 {
-	DoDamage(OtherActor);
+	auto Character = Cast<ABaseCharacter>(OtherActor);
+	if(Character)
+	{
+		DoDamage(Character);
+
+		SpawnBlood(Character, RightWeaponSocket);
+	}
 }
 
-void AEnemy::DoDamage(AActor* Victim)
+void AEnemy::DoDamage(ABaseCharacter* Victim)
 {
 	if(Victim == nullptr)return;
 
-	auto Character = Cast<ABaseCharacter>(Victim);
-	if(Character)
+	if(Victim)
 	{
-		UGameplayStatics::ApplyDamage(Character, BaseDamage, EnemyController, this, UDamageType::StaticClass());
-		if(Character->GetMeleeImpactSound())
+		UGameplayStatics::ApplyDamage(Victim, BaseDamage, EnemyController, this, UDamageType::StaticClass());
+		if(Victim->GetMeleeImpactSound())
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, Character->GetMeleeImpactSound(), GetActorLocation());
+			UGameplayStatics::PlaySoundAtLocation(this, Victim->GetMeleeImpactSound(), GetActorLocation());
 		}
 	}
 }
@@ -365,4 +379,21 @@ void AEnemy::ActivateRightWeapon()
 void AEnemy::DeactivateRightWeapon()
 {
 	RightWeaponCollision -> SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemy::SpawnBlood(ABaseCharacter* Victim, FName SocketName)
+{
+	const USkeletalMeshSocket* TipSocket{GetMesh() -> GetSocketByName(SocketName)};
+		if(TipSocket)
+		{
+			const FTransform SocketTransform{TipSocket->GetSocketTransform(GetMesh())};
+			if(Victim->GetBloodParticles())
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					Victim->GetBloodParticles(),
+					SocketTransform
+				);
+			}
+		}
 }

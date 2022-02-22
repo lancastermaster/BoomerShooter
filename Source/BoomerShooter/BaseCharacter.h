@@ -103,6 +103,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
 	class USoundCue* MeleeImpactSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class UParticleSystem* BloodParticles;
+
 public:
 	FORCEINLINE USoundCue* GetMeleeImpactSound()const{return MeleeImpactSound;}
+	FORCEINLINE UParticleSystem* GetBloodParticles() const {return BloodParticles;}
 };

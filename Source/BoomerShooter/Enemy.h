@@ -124,7 +124,9 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UFUNCTION(BlueprintCallable)
 		void DeactivateRightWeapon();
 
-		void DoDamage(AActor* Victim);
+		void DoDamage(class ABaseCharacter* Victim);
+
+		void SpawnBlood(ABaseCharacter* Victim, FName SocketName);
 
 	private:
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
@@ -202,6 +204,12 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UBoxComponent* RightWeaponCollision;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		FName LeftWeaponSocket;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		FName RightWeaponSocket;
 
 	public:
 		FORCEINLINE FString GetHeadBone() const {return HeadBone;}
