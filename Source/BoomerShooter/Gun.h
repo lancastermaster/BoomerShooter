@@ -11,10 +11,10 @@
  */
 UENUM(BlueprintType)
 		enum class EGunType : uint8 {
-			RIFLE = 0 UMETA(DisplayName = "RIFLE"),
-			SHOTGUN = 1 UMETA(DisplayName = "SHOTGUN"),
-			PROJECTILELAUNCHER = 2 UMETA(DisplayName = "PROJECTILELAUNCHER"),
-			LASER = 3 UMETA(DisplayName = "LASER")
+			NONE = 0 UMETA(DisplayName = "NONE"),
+			RIFLE = 1 UMETA(DisplayName = "RIFLE"),
+			SHOTGUN = 2 UMETA(DisplayName = "SHOTGUN"),
+			PROJECTILELAUNCHER = 3 UMETA(DisplayName = "PROJECTILELAUNCHER")
 		};
 
 UCLASS()
@@ -37,8 +37,14 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float FireRate;
 
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		float ModFireRate;
+
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		EGunType GunType;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		EGunType GunMod;
 
 	protected:
 		// Called when the game starts or when spawned
@@ -78,4 +84,5 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		
 		class ABaseCharacter* PlayerCharacter;
 	private:
+
 };

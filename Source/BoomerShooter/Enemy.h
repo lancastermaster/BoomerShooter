@@ -128,6 +128,14 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 
 		void SpawnBlood(ABaseCharacter* Victim, FName SocketName);
 
+		void ResetCanAttack();
+
+		UFUNCTION(BlueprintCallable)
+		void FinishDeath();
+
+		UFUNCTION()
+		void DestroyEnemy();
+
 	private:
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		float MaxHealth = 100.f;
@@ -193,6 +201,9 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UAnimMontage* AttackMontage;
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		class UAnimMontage* DeathMontage;
+
 		//the four attack montage section names
 		FName AttackAFast;
 		FName AttackBFast;
@@ -210,6 +221,21 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		FName RightWeaponSocket;
+
+		UPROPERTY(VisibleAnywhere, Category = "Combat", meta = (AllowPrivateAccess = true))
+		bool bCanAttack;
+
+		FTimerHandle AttackWaitTimer;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		float AttackWaitTime;
+
+		bool bDying;
+
+		FTimerHandle DeathTimer;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		float DeathTime;
 
 	public:
 		FORCEINLINE FString GetHeadBone() const {return HeadBone;}

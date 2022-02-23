@@ -23,6 +23,8 @@ AEnemy::AEnemy()
 	bStunned = false;
 	HitReactTimeMin = .5f;
 	HitReactTimeMax = 3.f;
+	AttackWaitTime = 1.f;
+	DeathTime = 4.f;
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -45,6 +47,9 @@ AEnemy::AEnemy()
 	AttackB = (TEXT("AttackB"));
 	LeftWeaponSocket = (TEXT("FX_Trail_L_01"));
 	RightWeaponSocket = (TEXT("FX_Trail_R_01"));
+
+	bCanAttack = true;
+	bDying = false;
 }
 
 // Called when the game starts or when spawned
@@ -115,6 +120,8 @@ void AEnemy::BeginPlay()
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WorldPatrolPoint2);
 
 		EnemyController->RunBehaviorTree(BehaviorTree);
+	
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName ("CanAttack"), true);
 	}
 
 }
@@ -148,6 +155,9 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 			FRotator(0.f), 
 			true);
 	}
+
+	if(bDying)return;
+
 	if(CanSeeHealthBar)
 	{
 		ShowHealthBar();
@@ -164,6 +174,12 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsObject(
+			FName("Target"),
+			EventInstigator->GetPawn());
+	}
 	if(Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
@@ -188,15 +204,40 @@ void AEnemy::ShowHealthBar_Implementation()
 
 void AEnemy::Die()
 {
-	
+	if(bDying)return;
+	bDying = true;
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if(AnimInstance)
+	if(AnimInstance && DeathMontage)
 	{
-		AnimInstance->Montage_Play(HitMontage, 1.f);
-		AnimInstance->Montage_JumpToSection(FName("DeathA"), HitMontage);
+		AnimInstance->Montage_Play(DeathMontage, 1.f);
+		//AnimInstance->Montage_JumpToSection(FName("DeathA"), HitMontage);
+	}
+
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
+		EnemyController->StopMovement();
 	}
 	HideHealthBar();
+	//Destroy();
+}
+
+void AEnemy::FinishDeath()
+{
+	GetMesh()->bPauseAnims = true;
+
+	GetWorldTimerManager().SetTimer(
+		DeathTimer,
+		this, 
+		&AEnemy::DestroyEnemy, 
+		DeathTime);
+}
+
+void AEnemy::DestroyEnemy()
+{
+	Destroy();
 }
 
 void AEnemy::PlayHitMontage(FName Section, float PlayRate)
@@ -219,16 +260,29 @@ void AEnemy::PlayHitMontage(FName Section, float PlayRate)
 
 void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
 {
-	if(bInAttackRange)
-	{
+	//if(bInAttackRange)
+	//{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-		if(AnimInstance)
+		if(AnimInstance && AttackMontage)
 		{
 			AnimInstance->Montage_Play(AttackMontage, PlayRate);
 			AnimInstance->Montage_JumpToSection(Section, AttackMontage);
 		}
-	}
+
+		bCanAttack = false;
+		GetWorldTimerManager().SetTimer(
+			AttackWaitTimer,
+			this,
+			&AEnemy::ResetCanAttack,
+			AttackWaitTime
+		);
+
+		if(EnemyController)
+		{
+			EnemyController->GetBlackboardComponent()->SetValueAsBool(FName ("CanAttack"), false);
+		}
+	//}
 }
 
 FName AEnemy::GetAttackSectionName()
@@ -396,4 +450,13 @@ void AEnemy::SpawnBlood(ABaseCharacter* Victim, FName SocketName)
 				);
 			}
 		}
+}
+
+void AEnemy::ResetCanAttack()
+{
+	bCanAttack = true;
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName ("CanAttack"), true);
+	}
 }

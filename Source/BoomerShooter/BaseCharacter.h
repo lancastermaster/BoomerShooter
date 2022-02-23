@@ -40,6 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Attack();
+	void SecondaryAction();
 
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -57,10 +58,19 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 
+	void WeaponSecondaryPressed();
+	void WeaponSecondaryReleased();
+
 	void StartFireTimer();
+	void StartSecondaryFireTimer();
 
 	UFUNCTION()
 	void AutoFireReset();
+
+	UFUNCTION()
+	void SecondaryFireReset();
+
+	void Die();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10;
@@ -78,7 +88,13 @@ private:
 
 	FTimerHandle AutoFireTimer;
 
+	FTimerHandle SecondaryFireTimer;
+
 	bool bShouldFire; //true when firing possible, false when waiting for timer
+
+	bool bShouldSecondaryFire;
+
+	bool bWeaponSecondaryPressed;
 
 	int ActiveIndex = 0;
 
@@ -109,4 +125,5 @@ private:
 public:
 	FORCEINLINE USoundCue* GetMeleeImpactSound()const{return MeleeImpactSound;}
 	FORCEINLINE UParticleSystem* GetBloodParticles() const {return BloodParticles;}
+	FORCEINLINE bool GetWeaponSecondaryPressed() const {return bWeaponSecondaryPressed;}
 };

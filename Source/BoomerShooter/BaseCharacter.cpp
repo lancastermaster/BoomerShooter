@@ -6,6 +6,10 @@
 #include "Gun.h"
 #include "Camera/CameraComponent.h"
 #include "Containers/Array.h"
+#include "Kismet/GameplayStatics.h"
+#include "BoomerShooterPlayerController.h"
+#include "BoomerShooterAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -20,7 +24,9 @@ ABaseCharacter::ABaseCharacter()
 	WeaponSpawn -> SetupAttachment(Camera);
 
 	bShouldFire = true;
+	bShouldSecondaryFire = true;
 	bFireButtonPressed = false;
+	bWeaponSecondaryPressed = false;
 }
 
 // Called when the game starts or when spawned
@@ -40,9 +46,14 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bFireButtonPressed)
+	if(bFireButtonPressed && !bWeaponSecondaryPressed)
 	{
 		StartFireTimer();
+	}
+
+	if(bWeaponSecondaryPressed && bFireButtonPressed)
+	{
+		StartSecondaryFireTimer();
 	}
 }
 
@@ -57,6 +68,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &ABaseCharacter::FireButtonPressed);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Released, this, &ABaseCharacter::FireButtonReleased);
+	PlayerInputComponent->BindAction(TEXT("WeaponSecondary"), EInputEvent::IE_Pressed, this, &ABaseCharacter::WeaponSecondaryPressed);
+	PlayerInputComponent->BindAction(TEXT("WeaponSecondary"), EInputEvent::IE_Released, this, &ABaseCharacter::WeaponSecondaryReleased);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("NextWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::IncreaseActiveIndex);
 	PlayerInputComponent->BindAction(TEXT("PreviousWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::DecreaseActiveIndex);
@@ -86,6 +99,9 @@ void ABaseCharacter::Attack()
 {
 	switch(Gun->GunType)
 	{
+		case EGunType::NONE:
+		break;
+
 		case EGunType::RIFLE:
 		Gun->Attack();
 		break;
@@ -97,9 +113,26 @@ void ABaseCharacter::Attack()
 		case EGunType::PROJECTILELAUNCHER:
 		Gun->LaunchProjectile();
 		break;
+	}
+}
 
-		case EGunType::LASER:
-		Gun->Laser();
+void ABaseCharacter::SecondaryAction()
+{
+	switch(Gun->GunMod)
+	{
+		case EGunType::NONE:
+		break;
+
+		case EGunType::RIFLE:
+		Gun->Attack();
+		break;
+
+		case EGunType::SHOTGUN:
+		Gun->Shotgun();
+		break;
+
+		case EGunType::PROJECTILELAUNCHER:
+		Gun->LaunchProjectile();
 		break;
 	}
 }
@@ -131,6 +164,16 @@ void ABaseCharacter::FireButtonReleased()
     bFireButtonPressed = false;
 }
 
+void ABaseCharacter::WeaponSecondaryPressed()
+{
+	bWeaponSecondaryPressed = true;
+}
+
+void ABaseCharacter::WeaponSecondaryReleased()
+{
+	bWeaponSecondaryPressed = false;
+}
+
 void ABaseCharacter::StartFireTimer()
 {
 	if(bShouldFire)
@@ -141,12 +184,31 @@ void ABaseCharacter::StartFireTimer()
 	}
 }
 
+void ABaseCharacter::StartSecondaryFireTimer()
+{
+	if(bShouldSecondaryFire)
+	{
+		SecondaryAction();
+		bShouldSecondaryFire = false;
+		GetWorldTimerManager().SetTimer(SecondaryFireTimer, this, &ABaseCharacter::SecondaryFireReset, Gun->ModFireRate);
+	}
+}
+
 void ABaseCharacter::AutoFireReset()
 {
 	bShouldFire = true;
 	if(bFireButtonPressed)
 	{
 		StartFireTimer();
+	}
+}
+
+void ABaseCharacter::SecondaryFireReset()
+{
+	bShouldSecondaryFire = true;
+	if(bWeaponSecondaryPressed && bFireButtonPressed)
+	{
+		StartSecondaryFireTimer();
 	}
 }
 
@@ -190,10 +252,29 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 	if(Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
+		Die();
+
+		auto EnemyController = Cast<ABoomerShooterAIController>(EventInstigator);
+		if(EnemyController)
+		{
+			EnemyController->GetBlackboardComponent()->SetValueAsBool(
+				FName(TEXT("PlayerDead")), 
+				true);
+		}
 	}
 	else
 	{
 		Health -= DamageAmount;
 	}
 	return DamageAmount;
+}
+
+void ABaseCharacter::Die()
+{
+	ABoomerShooterPlayerController* PC = Cast<ABoomerShooterPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if(PC)
+	{
+		DisableInput(PC);
+		PC->bShowMouseCursor = true;
+	}
 }
