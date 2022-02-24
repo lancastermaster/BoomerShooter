@@ -65,7 +65,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 			IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(Hit.Actor.Get());
             if(BulletHitInterface)
             {
-                BulletHitInterface -> BulletHit_Implementation(Hit);
+                BulletHitInterface -> BulletHit_Implementation(Hit, MyOwner, MyOwnerInstigator);
             }
 
             AEnemy* HitEnemy = Cast<AEnemy>(Hit.Actor.Get());
@@ -79,19 +79,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
                 UDamageType::StaticClass());
             }
 		}
-
-		//UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
-		//UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, MyOwner, DamageTypeClass);
-		/*if(ProjectileParticles)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(
-				this,
-				ProjectileParticles,
-				GetActorLocation(),
-				GetActorRotation(),
-				true
-			);
-		}*/
 	}
 	Destroy();
 }

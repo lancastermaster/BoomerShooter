@@ -98,7 +98,7 @@ void AEnemy::BeginPlay()
 
 	const FVector WorldPatrolPoint2 = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint2);
 
-	DrawDebugSphere(
+	/*DrawDebugSphere(
 		GetWorld(),
 		WorldPatrolPoint,
 		25.f,
@@ -112,7 +112,7 @@ void AEnemy::BeginPlay()
 		25.f,
 		12,
 		FColor::Red,
-		true);
+		true);*/
 
 	if(EnemyController)
 	{
@@ -140,7 +140,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AEnemy::BulletHit_Implementation(FHitResult HitResult)
+void AEnemy::BulletHit_Implementation(FHitResult HitResult, AActor* Shooter, AController* ShooterController)
 {
 	if(ImpactSound)
 	{
@@ -154,21 +154,6 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 			HitResult.Location, 
 			FRotator(0.f), 
 			true);
-	}
-
-	if(bDying)return;
-
-	if(CanSeeHealthBar)
-	{
-		ShowHealthBar();
-	}
-
-	const float Stunned = FMath::RandRange(0.f,1.f);
-	if(Stunned <= StunChance)
-	{
-		//stun enemy
-		PlayHitMontage(FName("HitReactFront"));
-		SetStunned(true);
 	}
 }
 
@@ -189,7 +174,23 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageE
 	{
 		Health -= DamageAmount;
 	}
-	return 0.f;
+
+	if(bDying)return DamageAmount;
+
+	if(CanSeeHealthBar)
+	{
+		ShowHealthBar();
+	}
+
+	const float Stunned = FMath::RandRange(0.f,1.f);
+	if(Stunned <= StunChance)
+	{
+		//stun enemy
+		PlayHitMontage(FName("HitReactFront"));
+		SetStunned(true);
+	}
+
+	return DamageAmount;
 }
 
 void AEnemy::ShowHealthBar_Implementation()
@@ -324,10 +325,17 @@ void AEnemy::AgroSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	auto Character = Cast<ABaseCharacter>(OtherActor);
 	if(Character)
 	{
-		//set value of target blackboard key
-		EnemyController->GetBlackboardComponent()->SetValueAsObject(
+		if(EnemyController)
+		{
+			if(EnemyController->GetBlackboardComponent())
+			{
+				//set value of target blackboard key
+			EnemyController->GetBlackboardComponent()->SetValueAsObject(
 			TEXT("Target"), 
 			Character);
+			}
+		}
+		
 	}
 
 }

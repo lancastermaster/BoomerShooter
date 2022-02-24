@@ -32,8 +32,6 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		void LaunchProjectile();
 
-		void Laser();
-
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float FireRate;
 

@@ -103,7 +103,7 @@ void AGun::Attack()
             IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
             if(BulletHitInterface)
             {
-                BulletHitInterface -> BulletHit_Implementation(BeamHitResult);
+                BulletHitInterface -> BulletHit_Implementation(BeamHitResult, PlayerCharacter, this->GetOwnerController());
             }
 
             AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
@@ -173,7 +173,7 @@ void AGun::Shotgun()
                 IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
                 if(BulletHitInterface)
                 {
-                    BulletHitInterface -> BulletHit_Implementation(BeamHitResult);
+                    BulletHitInterface -> BulletHit_Implementation(BeamHitResult, PlayerCharacter, this->GetOwnerController());
                 }
                 
                 AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
@@ -242,73 +242,4 @@ void AGun::LaunchProjectile()
 
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotation);
 	Projectile->SetOwner(this);
-}
-
-void AGun::Laser()
-{
-
-    if(MuzzleSound != nullptr)
-    {
-        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
-        if(MuzzleFlash != nullptr)
-        {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation(), BulletSpawn->GetComponentRotation());
-        }
-    }
-
-    FHitResult BeamHitResult;
-    bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamHitResult);
-    if(bBeamEnd)
-    {
-        //Does hit actor implement BullHitInterface
-        if(BeamHitResult.Actor.IsValid())
-        {
-            IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
-            if(BulletHitInterface)
-            {
-                BulletHitInterface -> BulletHit_Implementation(BeamHitResult);
-            }
-
-            AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
-            if(HitEnemy)
-            {
-                if(BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
-                {
-                    UGameplayStatics::ApplyDamage(
-                    BeamHitResult.Actor.Get(), 
-                    CritDamage, 
-                    this->GetOwnerController(), 
-                    this, 
-                    UDamageType::StaticClass());
-                }
-                else
-                {
-                    UGameplayStatics::ApplyDamage(
-                    BeamHitResult.Actor.Get(), 
-                    Damage, 
-                    this->GetOwnerController(), 
-                    this, 
-                    UDamageType::StaticClass());
-                }
-            }
-        }
-        else
-        {
-            //Spawn default particles
-            if(HitParticles)
-            {
-                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamHitResult.Location);
-            }
-        }
-
-        if(BeamParticles)
-        {
-            UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
-            if(Beam)
-            {
-                Beam->SetVectorParameter(FName("Source"), BulletSpawn->GetComponentLocation());
-                Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
-            }
-        }
-    }
 }
