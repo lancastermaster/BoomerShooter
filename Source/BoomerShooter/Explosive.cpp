@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/SphereComponent.h"
 #include "Gameframework/Character.h"
+#include "Projectile.h"
 
 // Sets default values
 AExplosive::AExplosive()
@@ -52,13 +53,12 @@ void AExplosive::BulletHit_Implementation(FHitResult HitResult, AActor* Shooter,
 			true);
 	}
 
-	//todo: apply explosive damage
 	TArray <AActor*> OverlappingActors;
 	GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
 
 	for(auto Actor : OverlappingActors)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Actor damaged by explosive: %s"), *Actor->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("Actor damaged by explosive: %s"), *Actor->GetName());
 		UGameplayStatics::ApplyDamage(
 			Actor,
 			Damage,

@@ -53,7 +53,10 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 	if(bWeaponSecondaryPressed && bFireButtonPressed)
 	{
-		StartSecondaryFireTimer();
+		if(Mana >= Gun->GetModManaCost())
+		{
+			StartSecondaryFireTimer();
+		}
 	}
 }
 
@@ -125,14 +128,17 @@ void ABaseCharacter::SecondaryAction()
 
 		case EGunType::RIFLE:
 		Gun->Attack();
+		Mana -= Gun->GetModManaCost();
 		break;
 
 		case EGunType::SHOTGUN:
 		Gun->Shotgun();
+		Mana -= Gun->GetModManaCost();
 		break;
 
 		case EGunType::PROJECTILELAUNCHER:
 		Gun->LaunchProjectile();
+		Mana -= Gun->GetModManaCost();
 		break;
 	}
 }

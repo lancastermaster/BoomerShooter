@@ -241,5 +241,5 @@ void AGun::LaunchProjectile()
     }
 
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotation);
-	Projectile->SetOwner(this);
+	Projectile->SetOwner(this->GetOwner());
 }

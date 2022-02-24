@@ -79,8 +79,13 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		TSubclassOf<class AProjectile> ProjectileClass;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		float ModManaCost = 0.f;
 		
 		class ABaseCharacter* PlayerCharacter;
 	private:
 
+	public:
+		FORCEINLINE float GetModManaCost() const {return ModManaCost;}
 };
