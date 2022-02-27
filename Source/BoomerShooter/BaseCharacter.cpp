@@ -57,6 +57,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 		{
 			StartSecondaryFireTimer();
 		}
+		return;
 	}
 }
 
@@ -106,15 +107,15 @@ void ABaseCharacter::Attack()
 		break;
 
 		case EGunType::RIFLE:
-		Gun->Attack();
+		Gun->Rifle(Gun->GetBulletSpawn());
 		break;
 
 		case EGunType::SHOTGUN:
-		Gun->Shotgun();
+		Gun->Shotgun(Gun->GetBulletSpawn());
 		break;
 
 		case EGunType::PROJECTILELAUNCHER:
-		Gun->LaunchProjectile();
+		Gun->LaunchProjectile(Gun->GetBulletSpawn());
 		break;
 	}
 }
@@ -127,17 +128,17 @@ void ABaseCharacter::SecondaryAction()
 		break;
 
 		case EGunType::RIFLE:
-		Gun->Attack();
+		Gun->Rifle(Gun->GetBulletSpawn2());
 		Mana -= Gun->GetModManaCost();
 		break;
 
 		case EGunType::SHOTGUN:
-		Gun->Shotgun();
+		Gun->Shotgun(Gun->GetBulletSpawn2());
 		Mana -= Gun->GetModManaCost();
 		break;
 
 		case EGunType::PROJECTILELAUNCHER:
-		Gun->LaunchProjectile();
+		Gun->LaunchProjectile(Gun->GetBulletSpawn2());
 		Mana -= Gun->GetModManaCost();
 		break;
 	}

@@ -28,9 +28,11 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		virtual void Attack() override;
 
-		void Shotgun();
+		void Rifle(USceneComponent* BulletStart);
 
-		void LaunchProjectile();
+		void Shotgun(USceneComponent* BulletStart);
+
+		void LaunchProjectile(USceneComponent* BulletStart);
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float FireRate;
@@ -73,6 +75,8 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		class USceneComponent* BulletSpawn;
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		class USceneComponent* BulletSpawn2;
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		int BulletCount;
@@ -88,4 +92,6 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 	public:
 		FORCEINLINE float GetModManaCost() const {return ModManaCost;}
+		FORCEINLINE USceneComponent* GetBulletSpawn() const {return BulletSpawn;}
+		FORCEINLINE USceneComponent* GetBulletSpawn2() const {return BulletSpawn2;}
 };

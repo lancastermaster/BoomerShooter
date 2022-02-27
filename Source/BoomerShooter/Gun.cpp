@@ -19,6 +19,9 @@ AGun::AGun()
     BulletSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("BulletSpawn"));
     BulletSpawn -> SetupAttachment(WeaponMesh);
 
+    BulletSpawn2 = CreateDefaultSubobject<USceneComponent>(TEXT("BulletSpawn2"));
+    BulletSpawn2 -> SetupAttachment(WeaponMesh);
+
     PlayerCharacter = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
 }
 
@@ -150,21 +153,91 @@ void AGun::Attack()
     }
 }
 
-void AGun::Shotgun()
+void AGun::Rifle(USceneComponent* BulletStart)
+{
+    Super::Attack();
+
+    if(MuzzleSound != nullptr)
+    {
+        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());
+        if(MuzzleFlash != nullptr)
+        {
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
+        }
+    }
+
+    FHitResult BeamHitResult;
+    bool bBeamEnd = GetBeamEndLocation(BulletStart->GetComponentLocation(), BeamHitResult);
+    if(bBeamEnd)
+    {
+        //Does hit actor implement BullHitInterface
+        if(BeamHitResult.Actor.IsValid())
+        {
+            IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
+            if(BulletHitInterface)
+            {
+                BulletHitInterface -> BulletHit_Implementation(BeamHitResult, PlayerCharacter, this->GetOwnerController());
+            }
+
+            AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
+            if(HitEnemy)
+            {
+                if(BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
+                {
+                    UGameplayStatics::ApplyDamage(
+                    BeamHitResult.Actor.Get(), 
+                    CritDamage, 
+                    this->GetOwnerController(), 
+                    this, 
+                    UDamageType::StaticClass());
+                }
+                else
+                {
+                    UGameplayStatics::ApplyDamage(
+                    BeamHitResult.Actor.Get(), 
+                    Damage, 
+                    this->GetOwnerController(), 
+                    this, 
+                    UDamageType::StaticClass());
+                }
+            }
+        }
+        else
+        {
+            //Spawn default particles
+            if(HitParticles)
+            {
+                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamHitResult.Location);
+            }
+        }
+
+        if(BeamParticles)
+        {
+            UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
+            if(Beam)
+            {
+                Beam->SetVectorParameter(FName("Source"), BulletStart->GetComponentLocation());
+                Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
+            }
+        }
+    }
+}
+
+void AGun::Shotgun(USceneComponent* BulletStart)
 {
     if(MuzzleSound != nullptr)
     {
-        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
+        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());
         if(MuzzleFlash != nullptr)
         {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation(), BulletSpawn->GetComponentRotation());
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
         }
     }
 
     for(int i = 0; i < BulletCount; i++)
     {
         FHitResult BeamHitResult;
-        bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamHitResult);
+        bool bBeamEnd = GetBeamEndLocation(BulletStart->GetComponentLocation(), BeamHitResult);
         if(bBeamEnd)
         {
             //Does hit actor implement BullHitInterface
@@ -216,7 +289,7 @@ void AGun::Shotgun()
                 UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
                     GetWorld(), 
                     BeamParticles, 
-                    BulletSpawn->GetComponentLocation());
+                    BulletStart->GetComponentLocation());
                 if(Beam)
                 {
                     Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
@@ -226,17 +299,17 @@ void AGun::Shotgun()
     }
 }
 
-void AGun::LaunchProjectile()
+void AGun::LaunchProjectile(USceneComponent* BulletStart)
 {
-    FVector ProjectileSpawnLocation = BulletSpawn->GetComponentLocation();
-	FRotator ProjectileSpawnRotation = BulletSpawn->GetComponentRotation();
+    FVector ProjectileSpawnLocation = BulletStart->GetComponentLocation();
+	FRotator ProjectileSpawnRotation = BulletStart->GetComponentRotation();
 
     if(MuzzleSound != nullptr)
     {
-        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletSpawn->GetComponentLocation());
+        UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());
         if(MuzzleFlash != nullptr)
         {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletSpawn->GetComponentLocation(), BulletSpawn->GetComponentRotation());
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
         }
     }
 
