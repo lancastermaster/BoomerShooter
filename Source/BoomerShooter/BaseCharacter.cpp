@@ -46,19 +46,19 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bFireButtonPressed && !bWeaponSecondaryPressed)
+	if(bFireButtonPressed)
 	{
 		StartFireTimer();
 	}
 
-	if(bWeaponSecondaryPressed && bFireButtonPressed)
+	/*if(bWeaponSecondaryPressed && bFireButtonPressed)
 	{
 		if(Mana >= Gun->GetModManaCost())
 		{
 			StartSecondaryFireTimer();
 		}
 		return;
-	}
+	}*/
 }
 
 // Called to bind functionality to input
@@ -103,9 +103,6 @@ void ABaseCharacter::Attack()
 {
 	switch(Gun->GunType)
 	{
-		case EGunType::NONE:
-		break;
-
 		case EGunType::RIFLE:
 		Gun->Rifle(Gun->GetBulletSpawn());
 		break;
@@ -117,31 +114,31 @@ void ABaseCharacter::Attack()
 		case EGunType::PROJECTILELAUNCHER:
 		Gun->LaunchProjectile(Gun->GetBulletSpawn());
 		break;
+
+		case EGunType::SUPERSHOTGUN:
+		Gun->Shotgun(Gun->GetBulletSpawn());
+		Gun->Shotgun(Gun->GetBulletSpawn2());
+		break;
 	}
 }
 
 void ABaseCharacter::SecondaryAction()
 {
-	switch(Gun->GunMod)
+	/*switch(Gun->GunMod)
 	{
-		case EGunType::NONE:
+		case EModType::AIM:
+		//activates aiming/zoom function
+		//might include separate enum or modifier to determine zoom amount
 		break;
 
-		case EGunType::RIFLE:
-		Gun->Rifle(Gun->GetBulletSpawn2());
-		Mana -= Gun->GetModManaCost();
+		case EModType::QUICKFIRE:
+		//decrease FireRate timer by cetain amount
 		break;
 
-		case EGunType::SHOTGUN:
-		Gun->Shotgun(Gun->GetBulletSpawn2());
-		Mana -= Gun->GetModManaCost();
+		case EModType::OVERCHARGE:
+		//increase damage of weapon
 		break;
-
-		case EGunType::PROJECTILELAUNCHER:
-		Gun->LaunchProjectile(Gun->GetBulletSpawn2());
-		Mana -= Gun->GetModManaCost();
-		break;
-	}
+	}*/
 }
 
 void ABaseCharacter::SpawnGuns()
@@ -195,7 +192,7 @@ void ABaseCharacter::StartSecondaryFireTimer()
 {
 	if(bShouldSecondaryFire)
 	{
-		SecondaryAction();
+		//SecondaryAction();
 		bShouldSecondaryFire = false;
 		GetWorldTimerManager().SetTimer(SecondaryFireTimer, this, &ABaseCharacter::SecondaryFireReset, Gun->ModFireRate);
 	}

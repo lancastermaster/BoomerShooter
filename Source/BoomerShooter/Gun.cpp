@@ -12,6 +12,7 @@
 #include "Enemy.h"
 #include "Projectile.h"
 #include "BaseCharacter.h"
+#include "Math/UnrealMathUtility.h"
 
 
 AGun::AGun()
@@ -27,7 +28,7 @@ AGun::AGun()
 
 bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FHitResult& OutHitResult)
 {
-    float RandX = FMath::FRandRange(-GunSpread, GunSpread);
+    float RandY = FMath::FRandRange(-GunSpread, GunSpread);
     float RandZ = FMath::FRandRange(-GunSpread, GunSpread);
 
     FVector2D ViewPortSize;
@@ -50,12 +51,17 @@ bool AGun::GetBeamEndLocation(const FVector& BulletSpawnLocation, FHitResult& Ou
 
     if(bScreenToWorld)
     {
+        //CrosshairWorldDirection.Rotation().Yaw += RandZ;
+        FRotator CrosshairWorldDirectionRotation = CrosshairWorldDirection.Rotation();
+        CrosshairWorldDirectionRotation.Yaw += RandZ;
+        CrosshairWorldDirectionRotation.Pitch += RandY;
+        
         FHitResult ScreenTraceHit; 
         FVector Start{CrosshairWorldPosition};
-        FVector End {CrosshairWorldPosition + CrosshairWorldDirection * Range};
+        FVector End {CrosshairWorldPosition + CrosshairWorldDirectionRotation.Vector() * Range};
         FVector OutBeamLocation;
-        End.X = End.X + RandX;
-        End.Z = End.Z + RandZ; 
+        //End.X = End.X + RandX;
+        //End.Z = End.Z + RandZ; 
 
         //Set beam end point to line trace end point
         OutBeamLocation = End;
@@ -140,17 +146,18 @@ void AGun::Attack()
                 UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamHitResult.Location);
             }
         }
+    }
 
-        if(BeamParticles)
+    if(BeamParticles)
+    {
+        UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
+        if(Beam)
         {
-            UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
-            if(Beam)
-            {
-                Beam->SetVectorParameter(FName("Source"), BulletSpawn->GetComponentLocation());
-                Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
-            }
+            Beam->SetVectorParameter(FName("Source"), BulletSpawn->GetComponentLocation());
+            Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
         }
     }
+    
 }
 
 void AGun::Rifle(USceneComponent* BulletStart)
@@ -233,6 +240,8 @@ void AGun::Shotgun(USceneComponent* BulletStart)
             UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
         }
     }
+
+    //float InnerPellets = FMath::RoundHalfFromZero(BulletCount/2);
 
     for(int i = 0; i < BulletCount; i++)
     {
