@@ -93,12 +93,19 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 
 		UPROPERTY(EditAnywhere, Category = "Combat")
 		float ModManaCost = 0.f;
+
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		float BaseManaCost = 0.f;
 		
 		class ABaseCharacter* PlayerCharacter;
+		
 	private:
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		float ZoomFactor;
 
 	public:
 		FORCEINLINE float GetModManaCost() const {return ModManaCost;}
+		FORCEINLINE float GetBaseManaCost() const {return BaseManaCost;}
 		FORCEINLINE USceneComponent* GetBulletSpawn() const {return BulletSpawn;}
 		FORCEINLINE USceneComponent* GetBulletSpawn2() const {return BulletSpawn2;}
 };

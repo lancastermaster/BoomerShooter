@@ -40,7 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Attack();
-	void SecondaryAction();
+	//void SecondaryAction();
 
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -58,19 +58,21 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 
-	void WeaponSecondaryPressed();
-	void WeaponSecondaryReleased();
+	void AimButtonPressed();
+	void AimButtonReleased();
 
 	void StartFireTimer();
-	void StartSecondaryFireTimer();
+	//void StartSecondaryFireTimer();
 
 	UFUNCTION()
 	void AutoFireReset();
 
-	UFUNCTION()
-	void SecondaryFireReset();
+	//UFUNCTION()
+	//void SecondaryFireReset();
 
 	void Die();
+
+	void SpendMana(float ManaCost);
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10;
@@ -80,11 +82,17 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<AGun>> GunClasses;
-
-	UPROPERTY(EditAnywhere)
-	class UCameraComponent* Camera;
-
 private:
+
+	float CameraDefaultFOV;
+	float CameraZoomedFOV;
+	float CameraCurrentFOV;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	float ZoomInterpSpeed;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	//float WeaponZoomInterpSpeed;
 
 	FTimerHandle AutoFireTimer;
 
@@ -95,6 +103,9 @@ private:
 	bool bShouldSecondaryFire;
 
 	bool bWeaponSecondaryPressed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
+	bool bAiming;
 
 	int ActiveIndex = 0;
 
@@ -122,8 +133,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
 	class UParticleSystem* BloodParticles;
 
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	class UCameraComponent* Camera;
+
 public:
 	FORCEINLINE USoundCue* GetMeleeImpactSound()const{return MeleeImpactSound;}
 	FORCEINLINE UParticleSystem* GetBloodParticles() const {return BloodParticles;}
 	FORCEINLINE bool GetWeaponSecondaryPressed() const {return bWeaponSecondaryPressed;}
+	FORCEINLINE UCameraComponent* GetPlayerCamera() const {return Camera;}
 };

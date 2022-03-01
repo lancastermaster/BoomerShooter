@@ -10,6 +10,7 @@
 #include "BoomerShooterPlayerController.h"
 #include "BoomerShooterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -23,16 +24,27 @@ ABaseCharacter::ABaseCharacter()
 	WeaponSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Weapon Spawn Point"));
 	WeaponSpawn -> SetupAttachment(Camera);
 
+	bAiming = false;
 	bShouldFire = true;
 	bShouldSecondaryFire = true;
 	bFireButtonPressed = false;
 	bWeaponSecondaryPressed = false;
+	CameraDefaultFOV = 0.f; //set in BeginPlay
+	CameraZoomedFOV = 60.f;
+	ZoomInterpSpeed = 20.f;
+	CameraCurrentFOV = 0.f;
 }
 
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if(Camera)
+	{
+		CameraDefaultFOV = GetPlayerCamera() -> FieldOfView;
+		CameraCurrentFOV = CameraDefaultFOV;
+	}
 
 	Health = MaxHealth;
 	Mana = MaxMana;
@@ -46,19 +58,20 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bFireButtonPressed)
+	//setting CameraFOV
+	if(bAiming)
 	{
-		StartFireTimer();
+		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraZoomedFOV, DeltaTime, ZoomInterpSpeed);
 	}
-
-	/*if(bWeaponSecondaryPressed && bFireButtonPressed)
+	else
 	{
-		if(Mana >= Gun->GetModManaCost())
-		{
-			StartSecondaryFireTimer();
-		}
-		return;
-	}*/
+		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraDefaultFOV, DeltaTime, ZoomInterpSpeed);
+	}
+	GetPlayerCamera()->SetFieldOfView(CameraCurrentFOV);
+
+	if(bFireButtonPressed) StartFireTimer();
+
+	//if(bWeaponSecondaryPressed) StartSecondaryFireTimer();
 }
 
 // Called to bind functionality to input
@@ -72,8 +85,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &ABaseCharacter::FireButtonPressed);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Released, this, &ABaseCharacter::FireButtonReleased);
-	PlayerInputComponent->BindAction(TEXT("WeaponSecondary"), EInputEvent::IE_Pressed, this, &ABaseCharacter::WeaponSecondaryPressed);
-	PlayerInputComponent->BindAction(TEXT("WeaponSecondary"), EInputEvent::IE_Released, this, &ABaseCharacter::WeaponSecondaryReleased);
+	PlayerInputComponent->BindAction(TEXT("Aim"), EInputEvent::IE_Pressed, this, &ABaseCharacter::AimButtonPressed);
+	PlayerInputComponent->BindAction(TEXT("Aim"), EInputEvent::IE_Released, this, &ABaseCharacter::AimButtonReleased);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("NextWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::IncreaseActiveIndex);
 	PlayerInputComponent->BindAction(TEXT("PreviousWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::DecreaseActiveIndex);
@@ -101,45 +114,63 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	switch(Gun->GunType)
+	if(Mana > 0.f && Mana > Gun->GetBaseManaCost())
 	{
-		case EGunType::RIFLE:
-		Gun->Rifle(Gun->GetBulletSpawn());
-		break;
+		SpendMana(Gun->GetBaseManaCost());
+		switch(Gun->GunType)
+		{
+			case EGunType::RIFLE:
+			Gun->Rifle(Gun->GetBulletSpawn());
+			break;
 
-		case EGunType::SHOTGUN:
-		Gun->Shotgun(Gun->GetBulletSpawn());
-		break;
+			case EGunType::SHOTGUN:
+			Gun->Shotgun(Gun->GetBulletSpawn());
+			break;
 
-		case EGunType::PROJECTILELAUNCHER:
-		Gun->LaunchProjectile(Gun->GetBulletSpawn());
-		break;
+			case EGunType::PROJECTILELAUNCHER:
+			Gun->LaunchProjectile(Gun->GetBulletSpawn());
+			break;
 
-		case EGunType::SUPERSHOTGUN:
-		Gun->Shotgun(Gun->GetBulletSpawn());
-		Gun->Shotgun(Gun->GetBulletSpawn2());
-		break;
+			case EGunType::SUPERSHOTGUN:
+			Gun->Shotgun(Gun->GetBulletSpawn());
+			Gun->Shotgun(Gun->GetBulletSpawn2());
+			break;
+		}
 	}
 }
 
-void ABaseCharacter::SecondaryAction()
+/*void ABaseCharacter::SecondaryAction()
 {
-	/*switch(Gun->GunMod)
+	float BaseAttackRate = Gun-> FireRate;
+	float BaseDamage = Gun->Damage;
+
+	if(Mana > 0.f && Mana > (Gun->GetBaseManaCost() + Gun->GetModManaCost()))
 	{
-		case EModType::AIM:
-		//activates aiming/zoom function
-		//might include separate enum or modifier to determine zoom amount
-		break;
+		SpendMana(Gun->GetBaseManaCost());
+		SpendMana(Gun->GetModManaCost());
+		switch(Gun->GunMod)
+		{
+			case EModType::AIM:
+			//activates aiming/zoom function
+			//might include separate enum or modifier to determine zoom amount
+			break;
 
-		case EModType::QUICKFIRE:
-		//decrease FireRate timer by cetain amount
-		break;
+			case EModType::QUICKFIRE:
+			//decrease FireRate timer by certain amount
+			Gun->FireRate = Gun->FireRate/2.f;
+			StartFireTimer();
+			Gun->FireRate = BaseAttackRate;
+			break;
 
-		case EModType::OVERCHARGE:
-		//increase damage of weapon
-		break;
-	}*/
-}
+			case EModType::OVERCHARGE:
+			//increase damage of weapon
+			Gun->Damage = Gun->CritDamage;
+			StartFireTimer();
+			Gun->Damage = BaseDamage;
+			break;
+		}
+	}
+}*/
 
 void ABaseCharacter::SpawnGuns()
 {
@@ -168,14 +199,14 @@ void ABaseCharacter::FireButtonReleased()
     bFireButtonPressed = false;
 }
 
-void ABaseCharacter::WeaponSecondaryPressed()
+void ABaseCharacter::AimButtonPressed()
 {
-	bWeaponSecondaryPressed = true;
+	bAiming = true; 
 }
 
-void ABaseCharacter::WeaponSecondaryReleased()
+void ABaseCharacter::AimButtonReleased()
 {
-	bWeaponSecondaryPressed = false;
+	bAiming = false;
 }
 
 void ABaseCharacter::StartFireTimer()
@@ -188,15 +219,15 @@ void ABaseCharacter::StartFireTimer()
 	}
 }
 
-void ABaseCharacter::StartSecondaryFireTimer()
+/*void ABaseCharacter::StartSecondaryFireTimer()
 {
 	if(bShouldSecondaryFire)
 	{
-		//SecondaryAction();
+		SecondaryAction();
 		bShouldSecondaryFire = false;
-		GetWorldTimerManager().SetTimer(SecondaryFireTimer, this, &ABaseCharacter::SecondaryFireReset, Gun->ModFireRate);
+		GetWorldTimerManager().SetTimer(SecondaryFireTimer, this, &ABaseCharacter::SecondaryFireReset, Gun->FireRate);
 	}
-}
+}*/
 
 void ABaseCharacter::AutoFireReset()
 {
@@ -207,14 +238,14 @@ void ABaseCharacter::AutoFireReset()
 	}
 }
 
-void ABaseCharacter::SecondaryFireReset()
+/*void ABaseCharacter::SecondaryFireReset()
 {
 	bShouldSecondaryFire = true;
-	if(bWeaponSecondaryPressed && bFireButtonPressed)
+	if(bWeaponSecondaryPressed)
 	{
 		StartSecondaryFireTimer();
 	}
-}
+}*/
 
 void ABaseCharacter::EquipGun()
 {
@@ -271,6 +302,13 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 		Health -= DamageAmount;
 	}
 	return DamageAmount;
+}
+
+void ABaseCharacter::SpendMana(float ManaCost)
+{
+	if(Mana <= 0.f)return;
+	if(Mana < ManaCost)return;
+	Mana -= ManaCost;
 }
 
 void ABaseCharacter::Die()
