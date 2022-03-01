@@ -33,6 +33,7 @@ ABaseCharacter::ABaseCharacter()
 	CameraZoomedFOV = 60.f;
 	ZoomInterpSpeed = 20.f;
 	CameraCurrentFOV = 0.f;
+	ActiveIndex = 1;
 }
 
 // Called when the game starts or when spawned
@@ -139,54 +140,26 @@ void ABaseCharacter::Attack()
 	}
 }
 
-/*void ABaseCharacter::SecondaryAction()
-{
-	float BaseAttackRate = Gun-> FireRate;
-	float BaseDamage = Gun->Damage;
-
-	if(Mana > 0.f && Mana > (Gun->GetBaseManaCost() + Gun->GetModManaCost()))
-	{
-		SpendMana(Gun->GetBaseManaCost());
-		SpendMana(Gun->GetModManaCost());
-		switch(Gun->GunMod)
-		{
-			case EModType::AIM:
-			//activates aiming/zoom function
-			//might include separate enum or modifier to determine zoom amount
-			break;
-
-			case EModType::QUICKFIRE:
-			//decrease FireRate timer by certain amount
-			Gun->FireRate = Gun->FireRate/2.f;
-			StartFireTimer();
-			Gun->FireRate = BaseAttackRate;
-			break;
-
-			case EModType::OVERCHARGE:
-			//increase damage of weapon
-			Gun->Damage = Gun->CritDamage;
-			StartFireTimer();
-			Gun->Damage = BaseDamage;
-			break;
-		}
-	}
-}*/
-
 void ABaseCharacter::SpawnGuns()
 {
 	for(int i = 0; i < GunClasses.Num();i++)
 	{
-		Guns.EmplaceAt(i, GetWorld()->SpawnActor<AGun>(GunClasses[i]));
-
-		if(Guns[i] != nullptr)
-		{
-			Guns[i]->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
-			Guns[i]->SetOwner(this);
-			Guns[i] -> SetActorHiddenInGame(true);
-		}
+		SpawnGun(i);
 	}
-	EquipGun();
+	EquipGun(ActiveIndex);
 	Gun -> SetActorHiddenInGame(false);
+}
+
+void ABaseCharacter::SpawnGun(int i)
+{
+	Guns.EmplaceAt(i, GetWorld()->SpawnActor<AGun>(GunClasses[i]));
+
+	if(Guns[i] != nullptr)
+	{
+		Guns[i]->AttachToComponent(WeaponSpawn, FAttachmentTransformRules::KeepRelativeTransform);
+		Guns[i]->SetOwner(this);
+		Guns[i] -> SetActorHiddenInGame(true);
+	}
 }
 
 void ABaseCharacter::FireButtonPressed()
@@ -219,16 +192,6 @@ void ABaseCharacter::StartFireTimer()
 	}
 }
 
-/*void ABaseCharacter::StartSecondaryFireTimer()
-{
-	if(bShouldSecondaryFire)
-	{
-		SecondaryAction();
-		bShouldSecondaryFire = false;
-		GetWorldTimerManager().SetTimer(SecondaryFireTimer, this, &ABaseCharacter::SecondaryFireReset, Gun->FireRate);
-	}
-}*/
-
 void ABaseCharacter::AutoFireReset()
 {
 	bShouldFire = true;
@@ -238,18 +201,9 @@ void ABaseCharacter::AutoFireReset()
 	}
 }
 
-/*void ABaseCharacter::SecondaryFireReset()
+void ABaseCharacter::EquipGun(int i)
 {
-	bShouldSecondaryFire = true;
-	if(bWeaponSecondaryPressed)
-	{
-		StartSecondaryFireTimer();
-	}
-}*/
-
-void ABaseCharacter::EquipGun()
-{
-	Gun = Guns[ActiveIndex];
+	Gun = Guns[i];
 }
 
 void ABaseCharacter::IncreaseActiveIndex()
@@ -263,8 +217,13 @@ void ABaseCharacter::IncreaseActiveIndex()
 	{
 		ActiveIndex = 0;
 	}
-	EquipGun();
-	Gun -> SetActorHiddenInGame(false);
+
+	if(Guns[ActiveIndex])
+	{
+		EquipGun(ActiveIndex);
+		Gun -> SetActorHiddenInGame(false);
+	}
+	else IncreaseActiveIndex();
 }
 
 void ABaseCharacter::DecreaseActiveIndex()
@@ -278,8 +237,13 @@ void ABaseCharacter::DecreaseActiveIndex()
 	{
 		ActiveIndex = (Guns.Num()-1);
 	}
-	EquipGun();
-	Gun -> SetActorHiddenInGame(false);
+
+	if(Guns[ActiveIndex])
+	{
+		EquipGun(ActiveIndex);
+		Gun -> SetActorHiddenInGame(false);
+	}
+	else DecreaseActiveIndex();
 }
 
 float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& Damageevent, class AController* EventInstigator, AActor* DamageCauser)

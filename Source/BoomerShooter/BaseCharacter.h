@@ -40,7 +40,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Attack();
-	//void SecondaryAction();
 
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -50,9 +49,11 @@ protected:
 
 	void IncreaseActiveIndex();
 	void DecreaseActiveIndex();
-	void EquipGun();
+	void EquipGun(int i);
 
-	//void SpawnGun();
+	UFUNCTION(BlueprintCallable)
+	void SpawnGun(int i);
+
 	void SpawnGuns();
 
 	void FireButtonPressed();
@@ -62,13 +63,9 @@ protected:
 	void AimButtonReleased();
 
 	void StartFireTimer();
-	//void StartSecondaryFireTimer();
 
 	UFUNCTION()
 	void AutoFireReset();
-
-	//UFUNCTION()
-	//void SecondaryFireReset();
 
 	void Die();
 
@@ -80,7 +77,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* WeaponSpawn;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	TArray<TSubclassOf<AGun>> GunClasses;
 private:
 
@@ -90,9 +87,6 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float ZoomInterpSpeed;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	//float WeaponZoomInterpSpeed;
 
 	FTimerHandle AutoFireTimer;
 
