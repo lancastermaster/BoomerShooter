@@ -204,6 +204,9 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UAnimMontage* DeathMontage;
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		TArray<FName> AttackMontageSections;
+
 		//the four attack montage section names
 		FName AttackAFast;
 		FName AttackBFast;

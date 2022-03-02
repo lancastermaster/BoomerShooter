@@ -98,22 +98,6 @@ void AEnemy::BeginPlay()
 
 	const FVector WorldPatrolPoint2 = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint2);
 
-	/*DrawDebugSphere(
-		GetWorld(),
-		WorldPatrolPoint,
-		25.f,
-		12,
-		FColor::Red,
-		true);
-
-		DrawDebugSphere(
-		GetWorld(),
-		WorldPatrolPoint2,
-		25.f,
-		12,
-		FColor::Red,
-		true);*/
-
 	if(EnemyController)
 	{
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WorldPatrolPoint);
@@ -289,26 +273,17 @@ void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
 FName AEnemy::GetAttackSectionName()
 {
 	FName SectionName;
-	const int32 Section{FMath::RandRange(1,4)};
+	const int32 Section{FMath::RandRange(0, AttackMontageSections.Num()-1)};
 
-	switch(Section)
+	/*for(auto Name:AttackMontageSections)
 	{
-		case 1:
-			SectionName = AttackAFast;
-			break;
+		if(AttackMontageSections[Section] == Name)
+		{
+			SectionName = Name;
+		}
+	}*/
 
-		case 2:
-			SectionName = AttackBFast;
-			break;
-
-		case 3:
-			SectionName = AttackA;
-			break;
-
-		case 4:
-			SectionName = AttackB;
-			break;
-	}
+	SectionName = AttackMontageSections[Section];
 
 	return SectionName;
 }
