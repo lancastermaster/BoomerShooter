@@ -102,6 +102,7 @@ void AEnemy::BeginPlay()
 	{
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WorldPatrolPoint);
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WorldPatrolPoint2);
+		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("StartingPosition"), this->GetActorLocation());
 
 		EnemyController->RunBehaviorTree(BehaviorTree);
 	
@@ -275,14 +276,6 @@ FName AEnemy::GetAttackSectionName()
 	FName SectionName;
 	const int32 Section{FMath::RandRange(0, AttackMontageSections.Num()-1)};
 
-	/*for(auto Name:AttackMontageSections)
-	{
-		if(AttackMontageSections[Section] == Name)
-		{
-			SectionName = Name;
-		}
-	}*/
-
 	SectionName = AttackMontageSections[Section];
 
 	return SectionName;
@@ -305,9 +298,13 @@ void AEnemy::AgroSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 			if(EnemyController->GetBlackboardComponent())
 			{
 				//set value of target blackboard key
-			EnemyController->GetBlackboardComponent()->SetValueAsObject(
-			TEXT("Target"), 
-			Character);
+				EnemyController->GetBlackboardComponent()->SetValueAsObject(
+				TEXT("Target"), 
+				Character);
+
+				EnemyController->GetBlackboardComponent()->SetValueAsVector(
+				TEXT("TargetPosition"), 
+				Character->GetActorLocation());
 			}
 		}
 		
