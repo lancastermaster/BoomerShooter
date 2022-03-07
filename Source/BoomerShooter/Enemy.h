@@ -51,6 +51,9 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UFUNCTION(BlueprintCallable)
 		void PlayAttackMontage(FName Section, float PlayRate = 1.0f);
 
+		UFUNCTION(BlueprintCallable)
+		void PlayRangedAttackMontage(float PlayRate = 1.0f);
+
 		UFUNCTION(BlueprintPure)
 		FName GetAttackSectionName();
 
@@ -202,7 +205,10 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		class UAnimMontage* AttackMontage;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-		class UAnimMontage* DeathMontage;
+		UAnimMontage* DeathMontage;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		UAnimMontage* RangedAttackMontage;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		TArray<FName> AttackMontageSections;

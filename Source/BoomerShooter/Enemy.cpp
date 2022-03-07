@@ -103,10 +103,10 @@ void AEnemy::BeginPlay()
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WorldPatrolPoint);
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WorldPatrolPoint2);
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("StartingPosition"), this->GetActorLocation());
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName ("CanAttack"), true);
 
 		EnemyController->RunBehaviorTree(BehaviorTree);
 	
-		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName ("CanAttack"), true);
 	}
 
 }
@@ -279,6 +279,29 @@ FName AEnemy::GetAttackSectionName()
 	SectionName = AttackMontageSections[Section];
 
 	return SectionName;
+}
+
+void AEnemy::PlayRangedAttackMontage(float PlayRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if(AnimInstance && RangedAttackMontage)
+	{
+		AnimInstance->Montage_Play(RangedAttackMontage, PlayRate);
+	}
+
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(
+	AttackWaitTimer,
+	this,
+	&AEnemy::ResetCanAttack,
+	AttackWaitTime
+	);
+
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName ("CanAttack"), false);
+	}
 }
 
 void AEnemy::ResetHitReactTimer()

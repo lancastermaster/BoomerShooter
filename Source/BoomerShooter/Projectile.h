@@ -24,8 +24,10 @@ protected:
 
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float Damage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float CritDamage;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
