@@ -219,10 +219,10 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		FName AttackA;
 		FName AttackB;
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UBoxComponent* LeftWeaponCollision;
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		class UBoxComponent* RightWeaponCollision;
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
