@@ -33,6 +33,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AGun*> Guns;
 
+	UPROPERTY(BlueprintReadWrite)
 	bool bFireButtonPressed; //left mouse or right trigger
 
 protected:

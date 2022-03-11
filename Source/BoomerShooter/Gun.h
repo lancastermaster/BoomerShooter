@@ -33,6 +33,7 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		// Sets default values for this actor's properties
 		AGun();
 
+		UFUNCTION(BlueprintCallable, Category = "Combat")
 		virtual void Attack() override;
 
 		void Rifle(USceneComponent* BulletStart);

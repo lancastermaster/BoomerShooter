@@ -163,8 +163,6 @@ void AGun::Attack()
 
 void AGun::Rifle(USceneComponent* BulletStart)
 {
-    Super::Attack();
-
     if(MuzzleSound != nullptr)
     {
         UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());

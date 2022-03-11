@@ -59,7 +59,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//setting CameraFOV
 	if(bAiming)
 	{
 		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraZoomedFOV, DeltaTime, ZoomInterpSpeed);
@@ -71,8 +70,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 	GetPlayerCamera()->SetFieldOfView(CameraCurrentFOV);
 
 	if(bFireButtonPressed) StartFireTimer();
-
-	//if(bWeaponSecondaryPressed) StartSecondaryFireTimer();
 }
 
 // Called to bind functionality to input
