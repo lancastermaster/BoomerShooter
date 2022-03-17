@@ -188,6 +188,9 @@ class BOOMERSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		bool bStunned;
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		bool bUseAgroSphere = true;
+
 		// 0: no stun chance, 1: 100% stun chance
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		float StunChance = .5f;

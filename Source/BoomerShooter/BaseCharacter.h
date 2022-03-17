@@ -42,6 +42,9 @@ protected:
 
 	void Attack();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void Interact();
+
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 

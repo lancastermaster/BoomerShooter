@@ -311,26 +311,24 @@ void AEnemy::ResetHitReactTimer()
 
 void AEnemy::AgroSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor == nullptr)return;
-
-	auto Character = Cast<ABaseCharacter>(OtherActor);
-	if(Character)
+	if(bUseAgroSphere)
 	{
-		if(EnemyController)
-		{
-			if(EnemyController->GetBlackboardComponent())
-			{
-				//set value of target blackboard key
-				EnemyController->GetBlackboardComponent()->SetValueAsObject(
-				TEXT("Target"), 
-				Character);
+		if(OtherActor == nullptr)return;
 
-				EnemyController->GetBlackboardComponent()->SetValueAsVector(
-				TEXT("TargetPosition"), 
-				Character->GetActorLocation());
+		auto Character = Cast<ABaseCharacter>(OtherActor);
+		if(Character)
+		{
+			if(EnemyController)
+			{
+				if(EnemyController->GetBlackboardComponent())
+				{
+					//set value of target blackboard key
+					EnemyController->GetBlackboardComponent()->SetValueAsObject(
+					TEXT("Target"), 
+					Character);
+				}
 			}
 		}
-		
 	}
 
 }
