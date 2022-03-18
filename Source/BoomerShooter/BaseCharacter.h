@@ -83,6 +83,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	TArray<TSubclassOf<AGun>> GunClasses;
+
+	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Exploration", meta = (AllowPrivateAccess = true))
+	TArray<TSubclassOf<AActor>> KeyClasses;
 private:
 
 	float CameraDefaultFOV;
@@ -131,7 +134,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
 	class UParticleSystem* BloodParticles;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	class UCameraComponent* Camera;
 
 public:
