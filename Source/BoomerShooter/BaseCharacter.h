@@ -122,6 +122,18 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
 	float Mana;
 
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float MaxFireMana;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float FireMana;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float MaxIceMana;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float IceMana;*/
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stress", meta = (AllowPrivateAccess = true))
 	float MaxStress;
 

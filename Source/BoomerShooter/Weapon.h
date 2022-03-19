@@ -26,6 +26,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 	float CritDamage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	class UTexture2D* Crosshair;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
