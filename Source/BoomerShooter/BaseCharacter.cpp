@@ -49,6 +49,9 @@ void ABaseCharacter::BeginPlay()
 
 	Health = MaxHealth;
 	Mana = MaxMana;
+	FireMana = MaxFireMana;
+	IceMana = MaxIceMana;
+	LightningMana = MaxLightningMana;
 	Stress = 0.f;
 	
 	SpawnGuns();
@@ -113,28 +116,45 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	if(Mana > 0.f && Mana > Gun->GetBaseManaCost())
+	switch(Gun->WeaponDamageType)
 	{
-		SpendMana(Gun->GetBaseManaCost());
-		switch(Gun->GunType)
-		{
-			case EGunType::RIFLE:
-			Gun->Rifle(Gun->GetBulletSpawn());
-			break;
+		case EWeaponDamageType::Ice:
+			IceMana = SpendMana(Gun->GetBaseManaCost(), IceMana);
+			UseWeapon();
+		break;
 
-			case EGunType::SHOTGUN:
-			Gun->Shotgun(Gun->GetBulletSpawn());
-			break;
+		case EWeaponDamageType::Lightning:
+			LightningMana = SpendMana(Gun->GetBaseManaCost(), LightningMana);
+			UseWeapon();
+		break; 
 
-			case EGunType::PROJECTILELAUNCHER:
-			Gun->LaunchProjectile(Gun->GetBulletSpawn());
-			break;
+		case EWeaponDamageType::Fire:
+			FireMana = SpendMana(Gun->GetBaseManaCost(), FireMana);
+			UseWeapon();
+		break;
+	}
+}
 
-			case EGunType::SUPERSHOTGUN:
-			Gun->Shotgun(Gun->GetBulletSpawn());
-			Gun->Shotgun(Gun->GetBulletSpawn2());
-			break;
-		}
+void ABaseCharacter::UseWeapon()
+{
+	switch(Gun->GunType)
+	{
+		case EGunType::RIFLE:
+		Gun->Rifle(Gun->GetBulletSpawn());
+		break;
+
+		case EGunType::SHOTGUN:
+		Gun->Shotgun(Gun->GetBulletSpawn());
+		break;
+
+		case EGunType::PROJECTILELAUNCHER:
+		Gun->LaunchProjectile(Gun->GetBulletSpawn());
+		break;
+
+		case EGunType::SUPERSHOTGUN:
+		Gun->Shotgun(Gun->GetBulletSpawn());
+		Gun->Shotgun(Gun->GetBulletSpawn2());
+		break;
 	}
 }
 
@@ -266,11 +286,16 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 	return DamageAmount;
 }
 
-void ABaseCharacter::SpendMana(float ManaCost)
+float ABaseCharacter::SpendMana(float ManaCost, float ManaBeingSpent)
 {
-	if(Mana <= 0.f)return;
-	if(Mana < ManaCost)return;
-	Mana -= ManaCost;
+	//if(ManaBeingSpent <= 0.f)return;
+	//if(ManaBeingSpent < ManaCost)return;
+	if(ManaBeingSpent > 0.f && ManaBeingSpent >= ManaCost)
+	{
+		ManaBeingSpent -= ManaCost;
+		return ManaBeingSpent;
+	}
+	return ManaBeingSpent;
 }
 
 void ABaseCharacter::Die()

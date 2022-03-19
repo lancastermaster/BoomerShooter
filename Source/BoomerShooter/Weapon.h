@@ -6,6 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+UENUM(BlueprintType)
+	enum class EWeaponDamageType : uint8 {
+		Ice = 0 UMETA(DisplayName = "Ice"),
+		Lightning = 1 UMETA(DisplayName = "Lightning"),
+		Fire = 2 UMETA(DisplayName = "Fire")
+	};
+
 UCLASS()
 class BOOMERSHOOTER_API AWeapon : public AActor
 {
@@ -28,6 +35,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	class UTexture2D* Crosshair;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	EWeaponDamageType WeaponDamageType;
 
 protected:
 	// Called when the game starts or when spawned

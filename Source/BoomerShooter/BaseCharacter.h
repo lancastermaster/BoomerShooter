@@ -60,6 +60,8 @@ protected:
 
 	void SpawnGuns();
 
+	void UseWeapon();
+
 	void FireButtonPressed();
 	void FireButtonReleased();
 
@@ -73,7 +75,7 @@ protected:
 
 	void Die();
 
-	void SpendMana(float ManaCost);
+	float SpendMana(float ManaCost, float ManaBeingSpent);
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10;
@@ -122,17 +124,23 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
 	float Mana;
 
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
 	float MaxFireMana;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
 	float FireMana;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
 	float MaxIceMana;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float IceMana;*/
+	float IceMana;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float MaxLightningMana;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	float LightningMana;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stress", meta = (AllowPrivateAccess = true))
 	float MaxStress;
