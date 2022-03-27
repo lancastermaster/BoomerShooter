@@ -11,6 +11,7 @@
 #include "BoomerShooterAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Math/UnrealMathUtility.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -283,6 +284,7 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 	{
 		Health -= DamageAmount;
 	}
+	UGameplayStatics::PlaySoundAtLocation(this, PlayerHurtCue, GetActorLocation());
 	return DamageAmount;
 }
 

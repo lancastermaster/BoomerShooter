@@ -157,6 +157,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	class UCameraComponent* Camera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class USoundCue* PlayerHurtCue;
+
 public:
 	FORCEINLINE USoundCue* GetMeleeImpactSound()const{return MeleeImpactSound;}
 	FORCEINLINE UParticleSystem* GetBloodParticles() const {return BloodParticles;}

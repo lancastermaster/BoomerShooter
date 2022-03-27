@@ -146,6 +146,7 @@ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageE
 {
 	if(EnemyController)
 	{
+		if(EventInstigator)
 		EnemyController->GetBlackboardComponent()->SetValueAsObject(
 			FName("Target"),
 			EventInstigator->GetPawn());
