@@ -75,6 +75,9 @@ protected:
 
 	void Die();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void Dodge();
+
 	float SpendMana(float ManaCost, float ManaBeingSpent);
 
 	UPROPERTY(EditAnywhere)

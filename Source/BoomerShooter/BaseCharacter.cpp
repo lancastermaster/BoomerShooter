@@ -93,6 +93,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction(TEXT("NextWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::IncreaseActiveIndex);
 	PlayerInputComponent->BindAction(TEXT("PreviousWeapon"), EInputEvent::IE_Pressed, this, &ABaseCharacter::DecreaseActiveIndex);
 	PlayerInputComponent->BindAction(TEXT("Interact"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Interact);
+	PlayerInputComponent->BindAction(TEXT("Dodge"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Dodge);
 }
 
 void ABaseCharacter::MoveForward(float AxisValue)
@@ -120,18 +121,27 @@ void ABaseCharacter::Attack()
 	switch(Gun->WeaponDamageType)
 	{
 		case EWeaponDamageType::Ice:
-			IceMana = SpendMana(Gun->GetBaseManaCost(), IceMana);
-			UseWeapon();
+			if(IceMana >= Gun->GetBaseManaCost())
+			{
+				IceMana = SpendMana(Gun->GetBaseManaCost(), IceMana);
+				UseWeapon();
+			}
 		break;
 
 		case EWeaponDamageType::Lightning:
-			LightningMana = SpendMana(Gun->GetBaseManaCost(), LightningMana);
-			UseWeapon();
+			if(LightningMana >= Gun->GetBaseManaCost())
+			{
+				LightningMana = SpendMana(Gun->GetBaseManaCost(), LightningMana);
+				UseWeapon();
+			}
 		break; 
 
 		case EWeaponDamageType::Fire:
-			FireMana = SpendMana(Gun->GetBaseManaCost(), FireMana);
-			UseWeapon();
+			if(FireMana >= Gun->GetBaseManaCost())
+			{
+				FireMana = SpendMana(Gun->GetBaseManaCost(), FireMana);
+				UseWeapon();
+			}
 		break;
 	}
 }
@@ -290,8 +300,6 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 
 float ABaseCharacter::SpendMana(float ManaCost, float ManaBeingSpent)
 {
-	//if(ManaBeingSpent <= 0.f)return;
-	//if(ManaBeingSpent < ManaCost)return;
 	if(ManaBeingSpent > 0.f && ManaBeingSpent >= ManaCost)
 	{
 		ManaBeingSpent -= ManaCost;
