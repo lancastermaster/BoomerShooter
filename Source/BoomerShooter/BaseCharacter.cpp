@@ -12,9 +12,20 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Math/UnrealMathUtility.h"
 #include "Sound/SoundCue.h"
+#include "Engine/EngineTypes.h"
 
 // Sets default values
-ABaseCharacter::ABaseCharacter()
+ABaseCharacter::ABaseCharacter():
+	bAiming(false),
+	bShouldFire(true),
+	bShouldSecondaryFire(true),
+	bFireButtonPressed(false),
+	bWeaponSecondaryPressed(false),
+	CameraDefaultFOV(0.f),
+	CameraZoomedFOV(60.f),
+	ZoomInterpSpeed(20.f),
+	CameraCurrentFOV(0.f),
+	ActiveIndex(1)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -24,17 +35,6 @@ ABaseCharacter::ABaseCharacter()
 
 	WeaponSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Weapon Spawn Point"));
 	WeaponSpawn -> SetupAttachment(Camera);
-
-	bAiming = false;
-	bShouldFire = true;
-	bShouldSecondaryFire = true;
-	bFireButtonPressed = false;
-	bWeaponSecondaryPressed = false;
-	CameraDefaultFOV = 0.f; //set in BeginPlay
-	CameraZoomedFOV = 60.f;
-	ZoomInterpSpeed = 20.f;
-	CameraCurrentFOV = 0.f;
-	ActiveIndex = 1;
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +47,8 @@ void ABaseCharacter::BeginPlay()
 		CameraDefaultFOV = GetPlayerCamera() -> FieldOfView;
 		CameraCurrentFOV = CameraDefaultFOV;
 	}
+
+	InitializeManaMap();
 
 	Health = MaxHealth;
 	Mana = MaxMana;
@@ -96,6 +98,26 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction(TEXT("Dodge"), EInputEvent::IE_Pressed, this, &ABaseCharacter::Dodge);
 }
 
+void ABaseCharacter::InitializeManaMap()
+{
+	ManaMap.Add(EManaType::EMT_Fire, MaxFireMana);
+	ManaMap.Add(EManaType::EMT_Ice, MaxIceMana);
+	ManaMap.Add(EManaType::EMT_Lightning, MaxLightningMana);
+}
+
+bool ABaseCharacter::HasMana()
+{
+	if(!Gun)return false;
+
+	auto ManaType = Gun->GetManaType();
+
+	if(ManaMap.Contains(ManaType))
+	{
+		return ManaMap[ManaType] > 0;
+	}
+	return false;
+}
+
 void ABaseCharacter::MoveForward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector() * AxisValue);
@@ -118,54 +140,16 @@ void ABaseCharacter::LookRight(float AxisValue)
 
 void ABaseCharacter::Attack()
 {
-	switch(Gun->WeaponDamageType)
+	if(!Gun) return;
+	if(!HasMana()) return;
+	auto ManaType = Gun->GetManaType();
+	int32 CurrentMana = ManaMap[ManaType];
+
+	if(CurrentMana > 0)
 	{
-		case EWeaponDamageType::Ice:
-			if(IceMana >= Gun->GetBaseManaCost())
-			{
-				IceMana = SpendMana(Gun->GetBaseManaCost(), IceMana);
-				UseWeapon();
-			}
-		break;
-
-		case EWeaponDamageType::Lightning:
-			if(LightningMana >= Gun->GetBaseManaCost())
-			{
-				LightningMana = SpendMana(Gun->GetBaseManaCost(), LightningMana);
-				UseWeapon();
-			}
-		break; 
-
-		case EWeaponDamageType::Fire:
-			if(FireMana >= Gun->GetBaseManaCost())
-			{
-				FireMana = SpendMana(Gun->GetBaseManaCost(), FireMana);
-				UseWeapon();
-			}
-		break;
-	}
-}
-
-void ABaseCharacter::UseWeapon()
-{
-	switch(Gun->GunType)
-	{
-		case EGunType::RIFLE:
-		Gun->Rifle(Gun->GetBulletSpawn());
-		break;
-
-		case EGunType::SHOTGUN:
-		Gun->Shotgun(Gun->GetBulletSpawn());
-		break;
-
-		case EGunType::PROJECTILELAUNCHER:
-		Gun->LaunchProjectile(Gun->GetBulletSpawn());
-		break;
-
-		case EGunType::SUPERSHOTGUN:
-		Gun->Shotgun(Gun->GetBulletSpawn());
-		Gun->Shotgun(Gun->GetBulletSpawn2());
-		break;
+		CurrentMana--;
+		ManaMap.Add(ManaType, CurrentMana);
+		Gun->Attack();
 	}
 }
 

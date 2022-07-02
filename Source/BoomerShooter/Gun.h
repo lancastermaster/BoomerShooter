@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Weapon.h"
+#include "ManaType.h"
 #include "Gun.generated.h"
 
 /**
@@ -104,9 +105,13 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		float ZoomFactor;
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+		EManaType ManaType;
+
 	public:
 		FORCEINLINE float GetModManaCost() const {return ModManaCost;}
 		FORCEINLINE float GetBaseManaCost() const {return BaseManaCost;}
 		FORCEINLINE USceneComponent* GetBulletSpawn() const {return BulletSpawn;}
 		FORCEINLINE USceneComponent* GetBulletSpawn2() const {return BulletSpawn2;}
+		FORCEINLINE EManaType GetManaType() const {return ManaType;}
 };

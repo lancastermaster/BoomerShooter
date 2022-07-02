@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ManaType.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
@@ -60,8 +61,6 @@ protected:
 
 	void SpawnGuns();
 
-	void UseWeapon();
-
 	void FireButtonPressed();
 	void FireButtonReleased();
 
@@ -79,6 +78,8 @@ protected:
 	void Dodge();
 
 	float SpendMana(float ManaCost, float ManaBeingSpent);
+	void InitializeManaMap();
+	bool HasMana();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10;
@@ -114,6 +115,9 @@ private:
 	bool bAiming;
 
 	int ActiveIndex = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	TMap<EManaType, int32> ManaMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
 	float MaxHealth;

@@ -17,14 +17,17 @@
 #include "BaseCharacter.h"
 
 // Sets default values
-AEnemy::AEnemy()
+AEnemy::AEnemy() :
+	bCanHitReact (true),
+	bStunned(false),
+	HitReactTimeMin (.5f),
+	HitReactTimeMax (3.f),
+	AttackWaitTime (1.f),
+	DeathTime (4.f),
+	bCanAttack (true),
+	bDying (false)
+
 {
-	bCanHitReact = true;
-	bStunned = false;
-	HitReactTimeMin = .5f;
-	HitReactTimeMax = 3.f;
-	AttackWaitTime = 1.f;
-	DeathTime = 4.f;
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -48,8 +51,7 @@ AEnemy::AEnemy()
 	LeftWeaponSocket = (TEXT("FX_Trail_L_01"));
 	RightWeaponSocket = (TEXT("FX_Trail_R_01"));
 
-	bCanAttack = true;
-	bDying = false;
+	
 }
 
 // Called when the game starts or when spawned

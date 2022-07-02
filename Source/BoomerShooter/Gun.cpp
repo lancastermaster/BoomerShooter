@@ -103,62 +103,25 @@ void AGun::Attack()
         }
     }
 
-    FHitResult BeamHitResult;
-    bool bBeamEnd = GetBeamEndLocation(BulletSpawn->GetComponentLocation(), BeamHitResult);
-    if(bBeamEnd)
+    switch(GunType)
     {
-        //Does hit actor implement BullHitInterface
-        if(BeamHitResult.Actor.IsValid())
-        {
-            IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
-            if(BulletHitInterface)
-            {
-                BulletHitInterface -> BulletHit_Implementation(BeamHitResult, PlayerCharacter, this->GetOwnerController());
-            }
+        case EGunType::RIFLE:
+            Rifle(BulletSpawn);
+        break;
 
-            AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
-            if(HitEnemy)
-            {
-                if(BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
-                {
-                    UGameplayStatics::ApplyDamage(
-                    BeamHitResult.Actor.Get(), 
-                    CritDamage, 
-                    this->GetOwnerController(), 
-                    this, 
-                    UDamageType::StaticClass());
-                }
-                else
-                {
-                    UGameplayStatics::ApplyDamage(
-                    BeamHitResult.Actor.Get(), 
-                    Damage, 
-                    this->GetOwnerController(), 
-                    this, 
-                    UDamageType::StaticClass());
-                }
-            }
-        }
-        else
-        {
-            //Spawn default particles
-            if(HitParticles)
-            {
-                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, BeamHitResult.Location);
-            }
-        }
-    }
+        case EGunType::SHOTGUN:
+            Shotgun(BulletSpawn);
+        break;
 
-    if(BeamParticles)
-    {
-        UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BulletSpawn->GetComponentLocation());
-        if(Beam)
-        {
-            Beam->SetVectorParameter(FName("Source"), BulletSpawn->GetComponentLocation());
-            Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
-        }
+        case EGunType::PROJECTILELAUNCHER:
+            LaunchProjectile(BulletSpawn);
+        break;
+
+        case EGunType::SUPERSHOTGUN:
+            Shotgun(BulletSpawn);
+            Shotgun(BulletSpawn2);
+        break;
     }
-    
 }
 
 void AGun::Rifle(USceneComponent* BulletStart)
