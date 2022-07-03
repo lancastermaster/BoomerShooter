@@ -66,6 +66,7 @@ protected:
 
 	void AimButtonPressed();
 	void AimButtonReleased();
+	void Aim(float DeltaTime);
 
 	void StartFireTimer();
 
@@ -77,7 +78,6 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Dodge();
 
-	float SpendMana(float ManaCost, float ManaBeingSpent);
 	void InitializeManaMap();
 	bool HasMana();
 
@@ -116,44 +116,35 @@ private:
 
 	int ActiveIndex = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats", meta = (AllowPrivateAccess = true))
 	TMap<EManaType, int32> ManaMap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
-	float MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 MaxHealth;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Health", meta = (AllowPrivateAccess = true))
-	float Health;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 Health;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float MaxMana;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 MaxStress;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float Mana;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 Stress;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float MaxFireMana;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 MaxMana;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float FireMana;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 Mana;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float MaxIceMana;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 MaxFireMana;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float IceMana;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 MaxIceMana;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float MaxLightningMana;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mana", meta = (AllowPrivateAccess = true))
-	float LightningMana;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stress", meta = (AllowPrivateAccess = true))
-	float MaxStress;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stress", meta = (AllowPrivateAccess = true))
-	float Stress;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats", meta = (AllowPrivateAccess = true))
+	int32 MaxLightningMana;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = true))
 	class USoundCue* MeleeImpactSound;

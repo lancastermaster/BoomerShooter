@@ -48,15 +48,11 @@ void ABaseCharacter::BeginPlay()
 		CameraCurrentFOV = CameraDefaultFOV;
 	}
 
-	InitializeManaMap();
-
 	Health = MaxHealth;
 	Mana = MaxMana;
-	FireMana = MaxFireMana;
-	IceMana = MaxIceMana;
-	LightningMana = MaxLightningMana;
-	Stress = 0.f;
-	
+	Stress = 0;
+
+	InitializeManaMap();
 	SpawnGuns();
 }
 
@@ -65,16 +61,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bAiming)
-	{
-		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraZoomedFOV, DeltaTime, ZoomInterpSpeed);
-	}
-	else
-	{
-		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraDefaultFOV, DeltaTime, ZoomInterpSpeed);
-	}
-	GetPlayerCamera()->SetFieldOfView(CameraCurrentFOV);
-
+	Aim(DeltaTime);
 	if(bFireButtonPressed) StartFireTimer();
 }
 
@@ -116,6 +103,19 @@ bool ABaseCharacter::HasMana()
 		return ManaMap[ManaType] > 0;
 	}
 	return false;
+}
+
+void ABaseCharacter::Aim(float DeltaTime)
+{
+	if(bAiming)
+	{
+		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraZoomedFOV, DeltaTime, ZoomInterpSpeed);
+	}
+	else
+	{
+		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraDefaultFOV, DeltaTime, ZoomInterpSpeed);
+	}
+	GetPlayerCamera()->SetFieldOfView(CameraCurrentFOV);
 }
 
 void ABaseCharacter::MoveForward(float AxisValue)
@@ -280,16 +280,6 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 	}
 	UGameplayStatics::PlaySoundAtLocation(this, PlayerHurtCue, GetActorLocation());
 	return DamageAmount;
-}
-
-float ABaseCharacter::SpendMana(float ManaCost, float ManaBeingSpent)
-{
-	if(ManaBeingSpent > 0.f && ManaBeingSpent >= ManaCost)
-	{
-		ManaBeingSpent -= ManaCost;
-		return ManaBeingSpent;
-	}
-	return ManaBeingSpent;
 }
 
 void ABaseCharacter::Die()
