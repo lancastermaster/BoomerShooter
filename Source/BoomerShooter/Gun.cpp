@@ -13,6 +13,7 @@
 #include "Projectile.h"
 #include "BaseCharacter.h"
 #include "Math/UnrealMathUtility.h"
+#include "Camera/CameraShakeBase.h"
 
 
 
@@ -129,10 +130,14 @@ void AGun::Rifle(USceneComponent* BulletStart)
     if(MuzzleSound != nullptr)
     {
         UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());
-        if(MuzzleFlash != nullptr)
-        {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
-        }
+    }
+    if(MuzzleFlash != nullptr)
+    {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
+    }
+    if(FireCameraShakeClass)
+    {
+        GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(FireCameraShakeClass);
     }
 
     FHitResult BeamHitResult;
@@ -197,10 +202,14 @@ void AGun::Shotgun(USceneComponent* BulletStart)
     if(MuzzleSound != nullptr)
     {
         UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());
-        if(MuzzleFlash != nullptr)
-        {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
-        }
+    }
+    if(MuzzleFlash != nullptr)
+    {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
+    }
+    if(FireCameraShakeClass)
+    {
+        GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(FireCameraShakeClass);
     }
 
     //float InnerPellets = FMath::RoundHalfFromZero(BulletCount/2);
@@ -278,10 +287,14 @@ void AGun::LaunchProjectile(USceneComponent* BulletStart)
     if(MuzzleSound != nullptr)
     {
         UGameplayStatics::SpawnSoundAtLocation(GetWorld(), MuzzleSound, BulletStart->GetComponentLocation());
-        if(MuzzleFlash != nullptr)
-        {
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
-        }
+    }
+    if(MuzzleFlash != nullptr)
+    {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BulletStart->GetComponentLocation(), BulletStart->GetComponentRotation());
+    }
+    if(FireCameraShakeClass)
+    {
+        GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(FireCameraShakeClass);
     }
 
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotation);

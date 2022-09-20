@@ -108,6 +108,9 @@ class BOOMERSHOOTER_API AGun : public AWeapon
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 		EManaType ManaType;
 
+		UPROPERTY(EditAnywhere, Category = "Combat")
+		TSubclassOf<class UCameraShakeBase> FireCameraShakeClass;
+
 	public:
 		FORCEINLINE float GetModManaCost() const {return ModManaCost;}
 		FORCEINLINE float GetBaseManaCost() const {return BaseManaCost;}
